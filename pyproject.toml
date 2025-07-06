@@ -58,7 +58,7 @@ wheel.packages = ["procgen"]
 
 [tool.cibuildwheel.linux]
 before-all = [
-    "yum install -y qt6-qtbase-devel qt6-qtbase-static || apt-get update && apt-get install -y qtbase6-dev qtbase6-dev-tools"
+    "yum install -y qt6-qtbase-devel qt6-qtbase-static"
 ]
 
 [tool.cibuildwheel.macos]
@@ -69,5 +69,5 @@ environment = { CMAKE_PREFIX_PATH = "/usr/local/opt/qt@6" }
 
 [tool.cibuildwheel.windows]
 before-all = [
-    "choco install qt6-default"
+    "choco install qt6"
 ]

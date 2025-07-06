@@ -37,18 +37,17 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       run: |
         sudo apt-get update
-        sudo apt-get install -y qtbase6-dev qtbase6-dev-tools
+        sudo apt-get install -y qt6-base-dev qt6-base-dev-tools libgl1-mesa-dev
 
     - name: Install Qt (macOS)
       if: matrix.os == 'macos-latest'
       run: |
         brew install qt@6
-        echo "CMAKE_PREFIX_PATH=/usr/local/opt/qt@6" >> $GITHUB_ENV
 
     - name: Install Qt (Windows)
       if: matrix.os == 'windows-latest'
       run: |
-        choco install qt6-default
+        choco install qt6
 
     - name: Install dependencies
       run: |
