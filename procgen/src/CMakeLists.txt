@@ -42,7 +42,7 @@ if(APPLE)
     )
 
     if(CMAKE_BUILD_TYPE STREQUAL "Release")
-        target_compile_options(procgen_env PRIVATE -march=ivybridge)
+        target_compile_options(procgen_env PRIVATE -march=native)
     endif()
 endif()
 

@@ -67,4 +67,4 @@ add_library(env
 )
 
 # find libenv.h header
-target_include_directories(env PUBLIC ${LIBENV_DIR})
+# target_include_directories(env PUBLIC ${LIBENV_DIR})

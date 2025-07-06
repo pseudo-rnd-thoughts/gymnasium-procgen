@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import random
 from collections.abc import Sequence
@@ -6,7 +8,7 @@ import gym3
 import numpy as np
 from gym3.libenv import CEnv
 
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+LIB_DIR = os.path.dirname(os.path.abspath(__file__))
 
 MAX_STATE_SIZE = 2**20
 
@@ -83,13 +85,13 @@ class BaseProcgenEnv(CEnv):
         render_mode=None,
     ):
         if resource_root is None:
-            resource_root = os.path.join(SCRIPT_DIR, "data", "assets") + os.sep
+            resource_root = os.path.join(LIB_DIR, "data", "assets")
             assert os.path.exists(resource_root)
 
-        lib_dir = os.path.join(SCRIPT_DIR, "data", "prebuilt")
+        print(f"{LIB_DIR=}")
         assert any(
             [
-                os.path.exists(os.path.join(lib_dir, name))
+                os.path.exists(os.path.join(LIB_DIR, name))
                 for name in ["libenv.so", "libenv.dylib", "env.dll"]
             ]
         ), "package is installed, but the prebuilt environment library is missing"
@@ -126,7 +128,7 @@ class BaseProcgenEnv(CEnv):
         self.options = options
 
         super().__init__(
-            lib_dir=lib_dir,
+            lib_dir=LIB_DIR,
             num=num,
             options=options,
             c_func_defs=[
