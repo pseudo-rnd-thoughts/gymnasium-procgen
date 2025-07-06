@@ -22,12 +22,12 @@ const int MARKER = 1003;
 /**
 ### Description
 
-The player must navigate a network of caves to reach the exit. Player 
-movement mimics the Atari game “Asteroids”: the ship can rotate and 
-travel forward or backward along the current axis. The majority of 
+The player must navigate a network of caves to reach the exit. Player
+movement mimics the Atari game “Asteroids”: the ship can rotate and
+travel forward or backward along the current axis. The majority of
 the reward comes from successfully reaching the end of the level,
-though additional reward can be collected by destroying target 
-objects along the way with the ship's lasers. There are stationary 
+though additional reward can be collected by destroying target
+objects along the way with the ship's lasers. There are stationary
 and moving lethal obstacles throughout the level.
 
 ### Action Space

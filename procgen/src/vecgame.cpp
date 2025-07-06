@@ -266,7 +266,7 @@ VecGame::VecGame(int _nenvs, VecOptions opts) {
         s.high.int32 = INT32_MAX;
         info_types.push_back(s);
     }
-    
+
     if (render_human) {
         struct libenv_tensortype s;
         strcpy(s.name, "rgb");
@@ -342,7 +342,7 @@ void VecGame::set_buffers(const std::vector<std::vector<void *>> &ac, const std:
             game->info_bufs = info[e];
             game->reward_ptr = &rew[e];
             game->first_ptr = &first[e];
-            
+
             // render the initial state so we don't see a black screen on the first frame
             fassert(!game->is_waiting_for_step);
             fassert(!game->initial_reset_complete);

@@ -38,17 +38,17 @@ const int NUM_GROUND_THEMES = (int)(GROUND_THEMES.size());
 /**
 ### Description
 
-A simple platformer. The goal is to collect the coin at the far right 
-of the level, and the player spawns on the far left. The agent must 
-dodge stationary saw obstacles, enemies that pace back and forth, and 
-chasms that lead to death. Note that while the previously released 
-version of CoinRun painted velocity information directly onto 
-observations, the current version does not. This makes the 
+A simple platformer. The goal is to collect the coin at the far right
+of the level, and the player spawns on the far left. The agent must
+dodge stationary saw obstacles, enemies that pace back and forth, and
+chasms that lead to death. Note that while the previously released
+version of CoinRun painted velocity information directly onto
+observations, the current version does not. This makes the
 environment significantly more difficult.
 
 ### Action Space
 
-The action space is `Discrete(15)` for which button combo to press. 
+The action space is `Discrete(15)` for which button combo to press.
 
 The different combos are:
 
@@ -72,11 +72,11 @@ The different combos are:
 
 ### Observation Space
 
-The observation space is a box space with the RGB pixels the agent 
+The observation space is a box space with the RGB pixels the agent
 sees in an `ndarray` of shape `(64, 64, 3)` with dtype `uint8`.
 
-**Note**: If you are using the vectorized environment, the 
-observation space is a dictionary space where the pixels are under 
+**Note**: If you are using the vectorized environment, the
+observation space is a dictionary space where the pixels are under
 the key "rgb".
 
 ### Rewards

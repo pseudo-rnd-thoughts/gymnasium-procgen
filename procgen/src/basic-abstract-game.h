@@ -120,7 +120,7 @@ class BasicAbstractGame : public Game {
 
     std::vector<float> asset_aspect_ratios;
     std::vector<int> asset_num_themes;
-    
+
     bool use_procgen_background = false;
     int background_index = 0;
     float bg_tile_ratio = 0.0f;

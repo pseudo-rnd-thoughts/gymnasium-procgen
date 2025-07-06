@@ -54,6 +54,6 @@ inline float clip_abs(float x, float y) {
 
 inline std::string to_lower(std::string s) {
     auto lc = s;
-    transform(lc.begin(), lc.end(), lc.begin(), [](unsigned char c){ return std::tolower(c); }); 
+    transform(lc.begin(), lc.end(), lc.begin(), [](unsigned char c){ return std::tolower(c); });
     return lc;
 }

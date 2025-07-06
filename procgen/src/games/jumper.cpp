@@ -90,8 +90,8 @@ The episode ends if any one of the following conditions is met:
 
 ### Known Issues
 
-In ~7% of levels, the player will spawn on top of an enemy or the 
-goal, resulting in the episode terminating after a single step 
+In ~7% of levels, the player will spawn on top of an enemy or the
+goal, resulting in the episode terminating after a single step
 regardless of which action is taken.
 
 */

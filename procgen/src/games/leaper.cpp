@@ -27,10 +27,10 @@ float sign(float x) {
 /**
 ### Description
 
-Inspired by the classic game “Frogger”. The player must cross several lanes to 
-reach the finish line and earn a reward. The first group of lanes contains cars 
-which must be avoided. The second group of lanes contains logs on a river. The 
-player must hop from log to log to cross the river. If the player falls in the 
+Inspired by the classic game “Frogger”. The player must cross several lanes to
+reach the finish line and earn a reward. The first group of lanes contains cars
+which must be avoided. The second group of lanes contains logs on a river. The
+player must hop from log to log to cross the river. If the player falls in the
 river, the episode ends.
 
 ### Action Space

@@ -79,7 +79,7 @@ The episode ends if any one of the following conditions is met:
 
 ### Known Issues
 
-There is a low probability of unsolvable level configurations, with either a 
+There is a low probability of unsolvable level configurations, with either a
 diamond or the exit being unreachable.
 
 */

@@ -169,7 +169,7 @@ void Game::game_init() {
 
 void Game::serialize(WriteBuffer *b) {
     b->write_int(SERIALIZE_VERSION);
-    
+
     b->write_string(game_name);
 
     b->write_int(options.paint_vel_info);

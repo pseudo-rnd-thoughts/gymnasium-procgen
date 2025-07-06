@@ -1,0 +1,90 @@
+[build-system]
+requires = [
+    "scikit-build-core>=0.8.0",
+    "pybind11>=2.10.0",
+]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "procgen"
+version = "1.0.0"
+description = "Procedurally Generated Game-Like RL Environments"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Farama Foundation", email = "jkterry@farama.org"}
+]
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "numpy>=1.19.0",
+    "gym>=0.18.0",
+    "gym3>=0.3.3",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=6.0.0",
+    "pytest-benchmark>=3.4.1",
+    "pytest-xdist",
+]
+dev = [
+    "pre-commit",
+]
+
+[project.urls]
+Homepage = "https://github.com/Farama-Foundation/gymnasium-procgen"
+Documentation = "https://procgen2.readthedocs.io"
+Repository = "https://github.com/Farama-Foundation/gymnasium-procgen"
+"Bug Tracker" = "https://github.com/Farama-Foundation/gymnasium-procgen/issues"
+
+[tool.scikit-build]
+cmake.build-type = "Release"
+cmake.verbose = true
+wheel.expand-macos-universal-tags = true
+
+[tool.scikit-build.metadata.version]
+provider = "scikit_build_core.metadata.setuptools_scm"
+
+[tool.setuptools_scm]
+write_to = "procgen/version.txt"
+
+[tool.cibuildwheel]
+build = "cp38-* cp39-* cp310-* cp311-* cp312-*"
+skip = "*-musllinux*"
+test-extras = ["test"]
+test-command = "pytest {project}/tests -v"
+
+[tool.cibuildwheel.linux]
+before-all = [
+    "yum install -y qt5-qtbase-devel qt5-qtbase-static || apt-get update && apt-get install -y qtbase5-dev qtbase5-dev-tools"
+]
+
+[tool.cibuildwheel.macos]
+before-all = [
+    "brew install qt@5"
+]
+environment = { CMAKE_PREFIX_PATH = "/usr/local/opt/qt@5" }
+
+[tool.cibuildwheel.windows]
+before-all = [
+    "choco install qt5-default"
+]
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+
+[tool.isort]
+profile = "black"
+line_length = 88

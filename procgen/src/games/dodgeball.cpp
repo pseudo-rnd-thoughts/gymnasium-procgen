@@ -26,18 +26,18 @@ const float BALL_V_ROT = PI * 0.23f;
 /**
 ### Description
 
-Loosely inspired by the Atari game “Berzerk”. The player spawns in a 
-room with a random configuration of walls and enemies. Touching a 
-wall loses the game and ends the episode. The player moves relatively 
-slowly and can navigate throughout the room. There are enemies which 
-also move slowly and which will occasionally throw balls at the 
-player. The player can also throw balls, but only in the direction 
-they are facing. If all enemies are hit, the player can move to the 
+Loosely inspired by the Atari game “Berzerk”. The player spawns in a
+room with a random configuration of walls and enemies. Touching a
+wall loses the game and ends the episode. The player moves relatively
+slowly and can navigate throughout the room. There are enemies which
+also move slowly and which will occasionally throw balls at the
+player. The player can also throw balls, but only in the direction
+they are facing. If all enemies are hit, the player can move to the
 unlocked platform and earn a significant level completion bonus.
 
 ### Action Space
 
-The action space is `Discrete(15)` for which button combo to press. 
+The action space is `Discrete(15)` for which button combo to press.
 
 The different combos are:
 
@@ -61,16 +61,16 @@ The different combos are:
 
 ### Observation Space
 
-The observation space is a box space with the RGB pixels the agent 
+The observation space is a box space with the RGB pixels the agent
 sees in an `ndarray` of shape `(64, 64, 3)` with dtype `uint8`.
 
-**Note**: If you are using the vectorized environment, the 
-observation space is a dictionary space where the pixels are under 
+**Note**: If you are using the vectorized environment, the
+observation space is a dictionary space where the pixels are under
 the key "rgb".
 
 ### Rewards
 
-A `+2` reward is given for each enemy hit. A further `+10` is 
+A `+2` reward is given for each enemy hit. A further `+10` is
 assigned after moving to the unlocked goal platform.
 
 ### Termination

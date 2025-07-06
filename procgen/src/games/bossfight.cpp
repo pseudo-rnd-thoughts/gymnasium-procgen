@@ -111,7 +111,7 @@ class BossfightGame : public BasicAbstractGame {
     int player_laser_theme = 0;
     int boss_laser_theme = 0;
     int damaged_until_time = 0;
-    
+
     bool shields_are_up = false;
     bool barriers_moves_right = false;
     float base_fire_prob = 0.0f;

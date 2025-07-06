@@ -1,15 +1,14 @@
 import os
 import random
-from typing import Sequence, Optional, List
+from collections.abc import Sequence
 
 import gym3
-from gym3.libenv import CEnv
 import numpy as np
-from .builder import build
+from gym3.libenv import CEnv
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
-MAX_STATE_SIZE = 2 ** 20
+MAX_STATE_SIZE = 2**20
 
 ENV_NAMES = [
     "bigfish",
@@ -52,7 +51,7 @@ DISTRIBUTION_MODE_DICT = {
 
 
 def create_random_seed():
-    rand_seed = random.SystemRandom().randint(0, 2 ** 31 - 1)
+    rand_seed = random.SystemRandom().randint(0, 2**31 - 1)
     try:
         # force MPI processes to definitely choose different random seeds
         from mpi4py import MPI
@@ -88,13 +87,14 @@ class BaseProcgenEnv(CEnv):
             assert os.path.exists(resource_root)
 
         lib_dir = os.path.join(SCRIPT_DIR, "data", "prebuilt")
-        if os.path.exists(lib_dir):
-            assert any([os.path.exists(os.path.join(lib_dir, name)) for name in ["libenv.so", "libenv.dylib", "env.dll"]]), "package is installed, but the prebuilt environment library is missing"
-            assert not debug, "debug has no effect for pre-compiled library"
-        else:
-            # only compile if we don't find a pre-built binary
-            lib_dir = build(debug=debug)
-        
+        assert any(
+            [
+                os.path.exists(os.path.join(lib_dir, name))
+                for name in ["libenv.so", "libenv.dylib", "env.dll"]
+            ]
+        ), "package is installed, but the prebuilt environment library is missing"
+        assert not debug, "debug has no effect for pre-compiled library"
+
         self.combos = self.get_combos()
 
         if render_mode is None:
@@ -171,7 +171,9 @@ class BaseProcgenEnv(CEnv):
             ("E",),
         ]
 
-    def keys_to_act(self, keys_list: Sequence[Sequence[str]]) -> List[Optional[np.ndarray]]:
+    def keys_to_act(
+        self, keys_list: Sequence[Sequence[str]]
+    ) -> list[np.ndarray | None]:
         """
         Convert list of keys being pressed to actions, used in interactive mode
         """
@@ -204,6 +206,7 @@ class ProcgenGym3Env(BaseProcgenEnv):
     """
     gym3 interface for Procgen
     """
+
     def __init__(
         self,
         num,
@@ -235,22 +238,20 @@ class ProcgenGym3Env(BaseProcgenEnv):
             distribution_mode = DISTRIBUTION_MODE_DICT[distribution_mode]
 
         options = {
-                "center_agent": bool(center_agent),
-                "use_generated_assets": bool(use_generated_assets),
-                "use_monochrome_assets": bool(use_monochrome_assets),
-                "restrict_themes": bool(restrict_themes),
-                "use_backgrounds": bool(use_backgrounds),
-                "paint_vel_info": bool(paint_vel_info),
-                "distribution_mode": distribution_mode,
-            }
+            "center_agent": bool(center_agent),
+            "use_generated_assets": bool(use_generated_assets),
+            "use_monochrome_assets": bool(use_monochrome_assets),
+            "restrict_themes": bool(restrict_themes),
+            "use_backgrounds": bool(use_backgrounds),
+            "paint_vel_info": bool(paint_vel_info),
+            "distribution_mode": distribution_mode,
+        }
         super().__init__(num, env_name, options, **kwargs)
-        
-        
+
+
 class ToBaselinesVecEnv(gym3.ToBaselinesVecEnv):
-    metadata = {
-        'render.modes': ['human', 'rgb_array'],
-        'video.frames_per_second' : 15
-    }
+    metadata = {"render.modes": ["human", "rgb_array"], "video.frames_per_second": 15}
+
     def render(self, mode="human"):
         info = self.env.get_info()[0]
         _, ob, _ = self.env.observe()
@@ -258,7 +259,7 @@ class ToBaselinesVecEnv(gym3.ToBaselinesVecEnv):
             if "rgb" in info:
                 return info["rgb"]
             else:
-                return ob['rgb'][0]        
+                return ob["rgb"][0]
 
 
 def ProcgenEnv(num_envs, env_name, **kwargs):

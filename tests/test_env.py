@@ -1,7 +1,8 @@
 import numpy as np
 import pytest
-from .env import ENV_NAMES
+
 from procgen import ProcgenGym3Env
+from procgen.env import ENV_NAMES
 
 
 @pytest.mark.parametrize("env_name", ["coinrun", "starpilot"])

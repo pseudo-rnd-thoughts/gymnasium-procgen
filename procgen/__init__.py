@@ -1,12 +1,10 @@
-import os
+"""Procgen2 - Procedurally Generated Game-Like RL Environments."""
 
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-version_path = os.path.join(SCRIPT_DIR, "version.txt")
-__version__ = open(version_path).read()
+__version__ = "1.0.0"
 
-from .env import ProcgenEnv, ProcgenGym3Env
-from .gym_registration import register_environments
+from env import ProcgenEnv, ProcgenGym3Env
+from registration import register_environments
 
 register_environments()
 
-__all__ = ["ProcgenEnv", "ProcgenGym3Env"]
+__all__ = ["ProcgenEnv", "ProcgenGym3Env", "__version__"]

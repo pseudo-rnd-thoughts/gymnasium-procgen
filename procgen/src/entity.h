@@ -11,7 +11,7 @@ class Entity {
     float vx = 0.0f;
     float vy = 0.0f;
     float rx = 0.0f;
-    float ry = 0.0f; 
+    float ry = 0.0f;
     int type = 0;
     int image_type = 0;
     int image_theme = 0;

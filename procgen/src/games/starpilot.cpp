@@ -34,7 +34,7 @@ bool spawn_cmp(const std::shared_ptr<Entity> &x, const std::shared_ptr<Entity> &
 
 A simple side scrolling shooter game. Relatively challenging for humans to play
 since all enemies fire projectiles that directly target the player. An inability
-to dodge quickly leads to the player's demise. There are fast and slow enemies, 
+to dodge quickly leads to the player's demise. There are fast and slow enemies,
 stationary turrets with high health, clouds which obscure player vision, and
 impassable meteors.
 

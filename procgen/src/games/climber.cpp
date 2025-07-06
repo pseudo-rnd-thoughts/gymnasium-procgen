@@ -29,15 +29,15 @@ const int NUM_WALL_THEMES = 4;
 /**
 ### Description
 
-A simple platformer. The player must climb a sequence of platforms, 
-collecting stars along the way. A small reward is given for 
-collecting a star, and a larger reward is given for collecting all 
-stars in a level. If all stars are collected, the episode ends. There 
+A simple platformer. The player must climb a sequence of platforms,
+collecting stars along the way. A small reward is given for
+collecting a star, and a larger reward is given for collecting all
+stars in a level. If all stars are collected, the episode ends. There
 are lethal flying monsters scattered throughout the level.
 
 ### Action Space
 
-The action space is `Discrete(15)` for which button combo to press. 
+The action space is `Discrete(15)` for which button combo to press.
 
 The different combos are:
 
@@ -61,16 +61,16 @@ The different combos are:
 
 ### Observation Space
 
-The observation space is a box space with the RGB pixels the agent 
+The observation space is a box space with the RGB pixels the agent
 sees in an `ndarray` of shape `(64, 64, 3)` with dtype `uint8`.
 
-**Note**: If you are using the vectorized environment, the 
-observation space is a dictionary space where the pixels are under 
+**Note**: If you are using the vectorized environment, the
+observation space is a dictionary space where the pixels are under
 the key "rgb".
 
 ### Rewards
 
-A reward of `+1` is allotted for every collected star. If all the 
+A reward of `+1` is allotted for every collected star. If all the
 stars are collected, a completion bonus of `+10` is given.
 
 ### Termination

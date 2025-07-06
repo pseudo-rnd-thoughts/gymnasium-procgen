@@ -26,13 +26,13 @@ const int ORB = 1002;
 ### Description
 
 Inspired by the Atari game “MsPacman”. Maze layouts are generated
-using Kruskal’s algorithm, and then walls are removed until no 
-dead-ends remain in the maze. The player must collect all the green 
-orbs. 3 large stars spawn that will make enemies vulnerable for a 
-short time when collected. A collision with an enemy that isn’t 
+using Kruskal’s algorithm, and then walls are removed until no
+dead-ends remain in the maze. The player must collect all the green
+orbs. 3 large stars spawn that will make enemies vulnerable for a
+short time when collected. A collision with an enemy that isn’t
 vulnerable results in the player’s death. When a vulnerable enemy is
-eaten, an egg spawns somewhere on the map that will hatch into a new 
-enemy after a short time, keeping the total number of enemies 
+eaten, an egg spawns somewhere on the map that will hatch into a new
+enemy after a short time, keeping the total number of enemies
 constant. The player receives a small reward for collecting each orb
 and a large reward for completing the level.
 

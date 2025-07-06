@@ -19,11 +19,11 @@ const int SHIP = 7;
 
 The player must destroy enemy pirate ships by firing cannonballs from its own
 ship at the bottom of the screen. An on-screen timer slowly counts down. If this
-timer runs out, the episode ends. Whenever the player fires, the timer skips 
-forward a few steps, encouraging the player to conserve ammunition. The player 
-must take care to avoid hitting friendly ships. The player receives a positive 
-reward for hitting an enemy ship and a large timer penalty for hitting a 
-friendly ship. A target in the bottom left corner identifies the color of the 
+timer runs out, the episode ends. Whenever the player fires, the timer skips
+forward a few steps, encouraging the player to conserve ammunition. The player
+must take care to avoid hitting friendly ships. The player receives a positive
+reward for hitting an enemy ship and a large timer penalty for hitting a
+friendly ship. A target in the bottom left corner identifies the color of the
 enemy ships to target.
 
 ### Action Space
