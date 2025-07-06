@@ -62,7 +62,7 @@ the key "rgb".
 ### Rewards
 
 A `+1` reward is given for each fish eaten.
-A further `+10` is assigned after succesfully completing one
+A further `+10` is assigned after successfully completing one
 episode.
 
 ### Termination

@@ -6,7 +6,7 @@ requires = [
 build-backend = "scikit_build_core.build"
 
 [project]
-name = "procgen"
+name = "gymnasium-procgen"
 version = "1.0.0"
 description = "Procedurally Generated Game-Like RL Environments"
 readme = "README.md"
@@ -44,7 +44,7 @@ dev = [
 
 [project.urls]
 Homepage = "https://github.com/Farama-Foundation/gymnasium-procgen"
-Documentation = "https://procgen2.readthedocs.io"
+Documentation = "https://gymnasium-procgen.farama.org"
 Repository = "https://github.com/Farama-Foundation/gymnasium-procgen"
 "Bug Tracker" = "https://github.com/Farama-Foundation/gymnasium-procgen/issues"
 
@@ -67,24 +67,16 @@ test-command = "pytest {project}/tests -v"
 
 [tool.cibuildwheel.linux]
 before-all = [
-    "yum install -y qt5-qtbase-devel qt5-qtbase-static || apt-get update && apt-get install -y qtbase5-dev qtbase5-dev-tools"
+    "yum install -y qt6-qtbase-devel qt6-qtbase-static || apt-get update && apt-get install -y qtbase6-dev qtbase6-dev-tools"
 ]
 
 [tool.cibuildwheel.macos]
 before-all = [
-    "brew install qt@5"
+    "brew install qt@6"
 ]
-environment = { CMAKE_PREFIX_PATH = "/usr/local/opt/qt@5" }
+environment = { CMAKE_PREFIX_PATH = "/usr/local/opt/qt@6" }
 
 [tool.cibuildwheel.windows]
 before-all = [
-    "choco install qt5-default"
+    "choco install qt6-default"
 ]
-
-[tool.black]
-line-length = 88
-target-version = ['py38']
-
-[tool.isort]
-profile = "black"
-line_length = 88

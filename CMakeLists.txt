@@ -9,8 +9,5 @@ set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 # Include custom cmake modules
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-# Find dependencies
-include(dependencies)
-
 # Add the main library
 add_subdirectory(procgen/src)

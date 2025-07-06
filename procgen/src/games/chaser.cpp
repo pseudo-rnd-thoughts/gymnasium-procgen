@@ -73,7 +73,7 @@ the key "rgb".
 ### Rewards
 
 A `+0.04` reward is given for each orb eaten.
-A further `+10` is assigned after succesfully completing one
+A further `+10` is assigned after successfully completing one
 episode.
 
 ### Termination

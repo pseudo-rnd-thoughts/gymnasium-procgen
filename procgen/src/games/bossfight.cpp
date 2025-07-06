@@ -80,9 +80,9 @@ the key "rgb".
 
 ### Rewards
 
-A `+1` reward is given for each time a certain ammount of damage is
+A `+1` reward is given for each time a certain amount of damage is
 dealt to the boss.
-A further `+10` is assigned after succesfully defeating the boss.
+A further `+10` is assigned after successfully defeating the boss.
 
 ### Termination
 

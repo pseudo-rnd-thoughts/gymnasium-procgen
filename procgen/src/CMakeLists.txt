@@ -21,11 +21,16 @@ target_include_directories(procgen_env
         ${GYM3_INCLUDE_DIRS}
 )
 
+# include qt6
+find_package(Qt6 COMPONENTS Core Gui REQUIRED)
+
+# target_link_libraries(env Qt6::Core Qt6::Gui)
+
 # Link libraries
 target_link_libraries(procgen_env
     PRIVATE
-        Qt${QT_VERSION_MAJOR}::Core
-        Qt${QT_VERSION_MAJOR}::Gui
+        Qt6::Core
+        Qt6::Gui
 )
 
 # Compiler-specific options

@@ -6,15 +6,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 
-option(PROCGEN_PACKAGE "Set if the python package is being built" OFF)
-
 # print commands used, useful for debugging build
 set(CMAKE_VERBOSE_MAKEFILE ${PROCGEN_PACKAGE})
 
-
 if(APPLE)
   # clang defaults to 20 errors, but usually only the first one is useful
-  add_compile_options(-ferror-limit=1)
+  # add_compile_options(-ferror-limit=1)
   # only produce errors on mac where development is done
   add_compile_options(-Werror -Wextra -Wshadow -Wall -Wformat=2 -Wundef -Wvla -Wmissing-include-dirs -Wnon-virtual-dtor -Wno-unused-parameter)
 endif()
@@ -35,9 +32,6 @@ if (APPLE OR UNIX)
   # leave frame pointers so that profiling tools will still work
   set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -fno-omit-frame-pointer")
 endif()
-
-# include qt5
-find_package(Qt5 COMPONENTS Gui REQUIRED)
 
 add_library(env
   SHARED
@@ -74,5 +68,3 @@ add_library(env
 
 # find libenv.h header
 target_include_directories(env PUBLIC ${LIBENV_DIR})
-
-target_link_libraries(env Qt5::Gui)

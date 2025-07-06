@@ -69,7 +69,7 @@ the key "rgb".
 
 ### Rewards
 
-A `+10` reward is assigned after succesfully completing one
+A `+10` reward is assigned after successfully completing one
 episode by reaching the finish line.
 
 ### Termination

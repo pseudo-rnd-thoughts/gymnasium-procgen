@@ -67,7 +67,7 @@ the key "rgb".
 ### Rewards
 
 A `+3` reward is given for each target destroyed.
-A further `+10` is assigned after succesfully completing one
+A further `+10` is assigned after successfully completing one
 episode.
 
 ### Termination
