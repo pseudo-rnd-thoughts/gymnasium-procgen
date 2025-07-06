@@ -71,7 +71,7 @@ class BaseProcgenEnv(CEnv):
 
     def __init__(
         self,
-        num,
+        num_envs,
         env_name,
         options,
         debug=False,
@@ -129,7 +129,7 @@ class BaseProcgenEnv(CEnv):
 
         super().__init__(
             lib_dir=LIB_DIR,
-            num=num,
+            num=num_envs,
             options=options,
             c_func_defs=[
                 "int get_state(libenv_env *, int, char *, int);",

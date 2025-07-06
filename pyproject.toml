@@ -69,5 +69,5 @@ environment = { CMAKE_PREFIX_PATH = "/usr/local/opt/qt@6" }
 
 [tool.cibuildwheel.windows]
 before-all = [
-    "choco install qt6"
+    "choco install qt6-base-dev"
 ]
