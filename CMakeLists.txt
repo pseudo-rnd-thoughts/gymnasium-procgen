@@ -1,4 +1,3 @@
-# ROOT CMakeLists.txt
 cmake_minimum_required(VERSION 3.15)
 project(gymnasium_procgen VERSION 1.0.0 LANGUAGES CXX)
 
@@ -15,31 +14,23 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
+# Discover VCPKG toolchain
+if (NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+  # VCPKG_ROOT is what Microsoft recommends,
+  # VCPKG_INSTALLATION_ROOT is what's defined on Azure
+  if(DEFINED ENV{VCPKG_ROOT})
+    set(CMAKE_TOOLCHAIN_FILE
+        "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+        CACHE STRING "")
+  elseif(DEFINED ENV{VCPKG_INSTALLATION_ROOT})
+    set(CMAKE_TOOLCHAIN_FILE
+        "$ENV{VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake"
+        CACHE STRING "")
+  endif()
+endif()
+
 # Find dependencies
 find_package(Qt6 REQUIRED COMPONENTS Core Gui)
-
-# Platform-specific compiler flags
-if(APPLE)
-    add_compile_options(-ferror-limit=1)
-    add_compile_options(-Werror -Wextra -Wshadow -Wall -Wformat=2 -Wundef -Wvla
-                       -Wmissing-include-dirs -Wnon-virtual-dtor -Wno-unused-parameter)
-endif()
-
-if(MSVC)
-    add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
-endif()
-
-# Optimization flags
-if(APPLE OR UNIX)
-    if(CMAKE_BUILD_TYPE STREQUAL "Release")
-        if(PROCGEN_PACKAGE)
-            add_compile_options(-march=ivybridge)
-        else()
-            add_compile_options(-march=native)
-        endif()
-    endif()
-    add_compile_options(-fno-omit-frame-pointer)
-endif()
 
 # Collect all source files from gymnasium_procgen/src
 file(GLOB_RECURSE SOURCES

@@ -264,4 +264,6 @@ class ToBaselinesVecEnv(gym3.ToBaselinesVecEnv):
 
 
 def ProcgenEnv(num_envs, env_name, **kwargs):
-    return ToBaselinesVecEnv(ProcgenGym3Env(num_envs=num_envs, env_name=env_name, **kwargs))
+    return ToBaselinesVecEnv(
+        ProcgenGym3Env(num_envs=num_envs, env_name=env_name, **kwargs)
+    )
