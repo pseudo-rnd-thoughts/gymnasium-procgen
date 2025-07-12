@@ -89,7 +89,7 @@ docker run --rm -it procgen python -c "from procgen import ProcgenGym3Env; env =
 
 The observation space is a box space with the RGB pixels the agent sees in a numpy array of shape (64, 64, 3).  The expected step rate for a human player is 15 Hz.
 
-The action space is `Discrete(15)` for which button combo to press.  The button combos are defined in [`env.py`](procgen/env.py).
+The action space is `Discrete(15)` for which button combo to press.  The button combos are defined in [`env.py`](gymnasium_procgen/env.py).
 
 If you are using the vectorized environment, the observation space is a dictionary space where the pixels are under the key "rgb".
 
@@ -198,9 +198,9 @@ The environment code is in C++ and is compiled into a shared library exposing th
 
 Once you have installed from source, you can customize an existing environment or make a new environment of your own.  If you want to create a fast C++ 2D environment, you can fork this repo and do the following:
 
-* Copy [`src/games/bigfish.cpp`](procgen/src/games/bigfish.cpp) to `src/games/<name>.cpp`
+* Copy [`src/games/bigfish.cpp`](gymnasium_procgen/src/games/bigfish.cpp) to `src/games/<name>.cpp`
 * Replace `BigFish` with `<name>` and `"bigfish"` with `"<name>"` in your cpp file
-* Add `src/games/<name>.cpp` to [`CMakeLists.txt`](procgen/CMakeLists.txt)
+* Add `src/games/<name>.cpp` to [`CMakeLists.txt`](gymnasium_procgen/CMakeLists.txt)
 * Run `python -m procgen.interactive --env-name <name>` to test it out
 
 This repo includes a travis configuration that will compile your environment and build python wheels for easy installation.  In order to have this build more quickly by caching the Qt compilation, you will want to configure a GCS bucket in [common.py](https://github.com/openai/procgen/blob/master/procgen-build/procgen_build/common.py#L5) and [setup service account credentials](https://github.com/openai/procgen/blob/master/procgen-build/procgen_build/build_package.py#L41).
