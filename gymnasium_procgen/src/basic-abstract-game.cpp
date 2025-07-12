@@ -118,7 +118,7 @@ void BasicAbstractGame::initialize_asset_if_necessary(int img_idx) {
     asset_aspect_ratios[img_idx] = aspect_ratio;
     asset_num_themes[type] = num_themes;
 
-    std::shared_ptr<QImage> reflection_ptr(new QImage(asset_ptr->flipped(Qt::Horizontal)));
+    std::shared_ptr<QImage> reflection_ptr(new QImage(asset_ptr->mirrored(true, false)));
     basic_reflections[img_idx] = reflection_ptr;
 }
 
