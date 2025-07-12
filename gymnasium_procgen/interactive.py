@@ -32,7 +32,7 @@ def make_interactive(vision, record_dir, **kwargs):
     else:
         ob_key = "rgb"
 
-    env = ProcgenGym3Env(num=1, **kwargs)
+    env = ProcgenGym3Env(num_envs=1, **kwargs)
     if record_dir is not None:
         env = VideoRecorderWrapper(
             env=env, directory=record_dir, ob_key=ob_key, info_key=info_key

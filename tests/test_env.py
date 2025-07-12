@@ -11,7 +11,7 @@ def test_seeding(env_name):
 
     def make_env(level_num):
         venv = ProcgenGym3Env(
-            num=num_envs, env_name=env_name, num_levels=1, start_level=level_num
+            num_envs=num_envs, env_name=env_name, num_levels=1, start_level=level_num
         )
         return venv
 
@@ -35,7 +35,7 @@ def test_seeding(env_name):
 def test_determinism(env_name):
     def collect_observations():
         rng = np.random.RandomState(0)
-        env = ProcgenGym3Env(num=2, env_name=env_name, rand_seed=23)
+        env = ProcgenGym3Env(num_envs=2, env_name=env_name, rand_seed=23)
         _, obs, _ = env.observe()
         obses = [obs["rgb"]]
         for _ in range(128):
@@ -56,7 +56,7 @@ def test_determinism(env_name):
 @pytest.mark.parametrize("env_name", ENV_NAMES)
 @pytest.mark.parametrize("num_envs", [1, 2, 16])
 def test_multi_speed(env_name, num_envs, benchmark):
-    env = ProcgenGym3Env(num=num_envs, env_name=env_name)
+    env = ProcgenGym3Env(num_envs=num_envs, env_name=env_name)
 
     actions = np.zeros([env.num])
 

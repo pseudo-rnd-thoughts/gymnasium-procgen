@@ -50,7 +50,7 @@ Repository = "https://github.com/Farama-Foundation/gymnasium-procgen"
 
 [tool.scikit-build]
 cmake.build-type = "Release"
-cmake.verbose = true
+build.verbose = true
 wheel.expand-macos-universal-tags = true
 
 # Include Python source files

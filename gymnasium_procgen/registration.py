@@ -19,7 +19,7 @@ def make_env(render_mode=None, render=False, **kwargs):
         use_viewer_wrapper = True
         kwargs["render_mode"] = "rgb_array"
 
-    env = ProcgenGym3Env(num=1, num_threads=0, **kwargs)
+    env = ProcgenGym3Env(num_envs=1, num_threads=0, **kwargs)
     env = ExtractDictObWrapper(env, key="rgb")
     if use_viewer_wrapper:
         env = ViewerWrapper(env, tps=15, info_key="rgb")

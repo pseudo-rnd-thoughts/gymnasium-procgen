@@ -85,10 +85,9 @@ class BaseProcgenEnv(CEnv):
         render_mode=None,
     ):
         if resource_root is None:
-            resource_root = os.path.join(LIB_DIR, "data", "assets")
+            resource_root = os.path.join(LIB_DIR, "data", "assets") + os.sep
             assert os.path.exists(resource_root)
 
-        print(f"{LIB_DIR=}, {os.listdir(LIB_DIR)=}")
         assert any(
             [
                 os.path.exists(os.path.join(LIB_DIR, name))
@@ -211,7 +210,7 @@ class ProcgenGym3Env(BaseProcgenEnv):
 
     def __init__(
         self,
-        num,
+        num_envs,
         env_name,
         center_agent=True,
         use_backgrounds=True,
@@ -248,7 +247,7 @@ class ProcgenGym3Env(BaseProcgenEnv):
             "paint_vel_info": bool(paint_vel_info),
             "distribution_mode": distribution_mode,
         }
-        super().__init__(num, env_name, options, **kwargs)
+        super().__init__(num_envs, env_name, options, **kwargs)
 
 
 class ToBaselinesVecEnv(gym3.ToBaselinesVecEnv):
@@ -265,4 +264,4 @@ class ToBaselinesVecEnv(gym3.ToBaselinesVecEnv):
 
 
 def ProcgenEnv(num_envs, env_name, **kwargs):
-    return ToBaselinesVecEnv(ProcgenGym3Env(num=num_envs, env_name=env_name, **kwargs))
+    return ToBaselinesVecEnv(ProcgenGym3Env(num_envs=num_envs, env_name=env_name, **kwargs))
