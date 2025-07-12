@@ -1,18 +1,4 @@
 cmake_minimum_required(VERSION 3.15)
-project(gymnasium_procgen VERSION 1.0.0 LANGUAGES CXX)
-
-# Set C++ standard
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-# Global compiler settings
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-set(CMAKE_CXX_VISIBILITY_PRESET hidden)
-
-# Build type defaults
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release)
-endif()
 
 # Discover VCPKG toolchain
 if (NOT DEFINED CMAKE_TOOLCHAIN_FILE)
@@ -27,6 +13,21 @@ if (NOT DEFINED CMAKE_TOOLCHAIN_FILE)
         "$ENV{VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake"
         CACHE STRING "")
   endif()
+endif()
+
+project(gymnasium_procgen VERSION 1.0.0 LANGUAGES CXX)
+
+# Set C++ standard
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Global compiler settings
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+
+# Build type defaults
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
 endif()
 
 # Find dependencies
