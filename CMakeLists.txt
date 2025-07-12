@@ -15,7 +15,10 @@ if (NOT DEFINED CMAKE_TOOLCHAIN_FILE)
   endif()
 endif()
 
-project(gymnasium_procgen VERSION 1.0.0 LANGUAGES CXX)
+file(READ "${CMAKE_CURRENT_SOURCE_DIR}/version.txt" PROCGEN_VERSION)
+string(STRIP "${PROCGEN_VERSION}" PROCGEN_VERSION)
+
+project(gymnasium_procgen VERSION ${PROCGEN_VERSION} LANGUAGES CXX)
 
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 17)

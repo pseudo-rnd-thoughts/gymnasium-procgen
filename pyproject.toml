@@ -7,7 +7,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "gymnasium-procgen"
-version = "1.0.0"
+version = "0.11.0"
 description = "Procedurally Generated Game-Like RL Environments"
 readme = "README.md"
 license = {text = "MIT"}
@@ -35,11 +35,6 @@ dependencies = [
 [project.optional-dependencies]
 test = [
     "pytest>=6.0.0",
-    "pytest-benchmark>=3.4.1",
-    "pytest-xdist",
-]
-dev = [
-    "pre-commit",
 ]
 
 [project.urls]
@@ -51,7 +46,50 @@ Repository = "https://github.com/Farama-Foundation/gymnasium-procgen"
 [tool.scikit-build]
 cmake.build-type = "Release"
 build.verbose = true
-wheel.expand-macos-universal-tags = true
 
 # Include Python source files
-wheel.packages = ["gymnasium_procgen"]
+# wheel.packages = ["gymnasium_procgen"]
+
+metadata.version.provider = "scikit_build_core.metadata.regex"
+metadata.version.input = "version.txt"
+metadata.version.regex = "^(?P<value>.+)$"
+
+[tool.cibuildwheel]
+# Skip 32-bit wheels, PyPy & musllinux
+skip = ["*-win32", "*i686", "pp*", "*-musllinux*"]
+
+build-frontend = "build"
+manylinux-x86_64-image = "manylinux-x86_64-vcpkg:latest"
+manylinux-aarch64-image = "manylinux-aarch64-vcpkg:latest"
+
+[tool.cibuildwheel.linux]
+environment-pass = ["GITHUB_REF"]
+
+[tool.cibuildwheel.macos]
+before-all = [
+    "brew update",
+    "brew upgrade",
+    "brew install automake autoconf libtool"
+]
+
+# macOS arm64
+[[tool.cibuildwheel.overrides]]
+select = "*-macosx_arm64"
+environment = { PIP_ONLY_BINARY = "numpy", VCPKG_FEATURE_FLAGS = "-compilertracking", MACOSX_DEPLOYMENT_TARGET = "13.0" }
+
+[[]]
+
+# Windows x64
+[[tool.cibuildwheel.overrides]]
+select = "*-win_amd64"
+environment = { PIP_ONLY_BINARY = "numpy", VCPKG_FEATURE_FLAGS = "-compilertracking" }
+
+# Linux x86-64 (manylinux)
+[[tool.cibuildwheel.overrides]]
+select = "*-manylinux_x86_64"
+environment = { PIP_ONLY_BINARY = "numpy", VCPKG_FEATURE_FLAGS = "-compilertracking" }
+
+# Linux ARM64 (manylinux)
+[[tool.cibuildwheel.overrides]]
+select = "*-manylinux_aarch64"
+environment = { PIP_ONLY_BINARY = "numpy", VCPKG_FEATURE_FLAGS = "-compilertracking" }
