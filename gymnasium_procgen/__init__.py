@@ -2,8 +2,8 @@
 
 __version__ = "1.0.0"
 
-from procgen.env import ProcgenEnv, ProcgenGym3Env
-from procgen.registration import register_environments
+from gymnasium_procgen.env import ProcgenEnv, ProcgenGym3Env
+from gymnasium_procgen.registration import register_environments
 
 register_environments()
 

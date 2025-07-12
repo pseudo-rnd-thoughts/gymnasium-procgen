@@ -3,8 +3,8 @@ import argparse
 
 from gym3 import Interactive, VideoRecorderWrapper, unwrap
 
-from procgen import ProcgenGym3Env
-from procgen.env import ENV_NAMES
+from gymnasium_procgen import ProcgenGym3Env
+from gymnasium_procgen.env import ENV_NAMES
 
 
 class ProcgenInteractive(Interactive):

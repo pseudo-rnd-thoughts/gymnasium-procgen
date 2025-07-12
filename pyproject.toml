@@ -54,20 +54,4 @@ cmake.verbose = true
 wheel.expand-macos-universal-tags = true
 
 # Include Python source files
-wheel.packages = ["procgen"]
-
-[tool.cibuildwheel.linux]
-before-all = [
-    "yum install -y qt6-qtbase-devel qt6-qtbase-static"
-]
-
-[tool.cibuildwheel.macos]
-before-all = [
-    "brew install qt@6"
-]
-environment = { CMAKE_PREFIX_PATH = "/usr/local/opt/qt@6" }
-
-[tool.cibuildwheel.windows]
-before-all = [
-    "choco install qt6-base-dev"
-]
+wheel.packages = ["gymnasium_procgen"]
