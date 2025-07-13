@@ -56,7 +56,7 @@ metadata.version.regex = "^(?P<value>.+)$"
 
 [tool.cibuildwheel]
 # Skip 32-bit wheels, PyPy & musllinux
-skip = ["*-win32", "*i686", "pp*", "*-musllinux*"]
+skip = ["*-win32", "*i686", "*-musllinux*"]
 
 build-frontend = "build"
 manylinux-x86_64-image = "manylinux-x86_64-vcpkg:latest"
@@ -75,7 +75,7 @@ before-all = [
 # macOS arm64
 [[tool.cibuildwheel.overrides]]
 select = "*-macosx_arm64"
-environment = { PIP_ONLY_BINARY = "numpy", VCPKG_FEATURE_FLAGS = "-compilertracking", MACOSX_DEPLOYMENT_TARGET = "13.0", VCPKG_DEFAULT_TRIPLET = "arm64-osx-native", VCPKG_OVERLAY_TRIPLETS = ".github/cmake"}
+environment = { PIP_ONLY_BINARY = "numpy", VCPKG_FEATURE_FLAGS = "-compilertracking", MACOSX_DEPLOYMENT_TARGET = "13.0", VCPKG_DEFAULT_TRIPLET = "arm64-osx-native", VCPKG_OVERLAY_TRIPLETS = "."}
 
 # Windows x64
 [[tool.cibuildwheel.overrides]]
