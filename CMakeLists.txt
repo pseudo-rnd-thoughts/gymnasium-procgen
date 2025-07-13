@@ -15,6 +15,14 @@ if (NOT DEFINED CMAKE_TOOLCHAIN_FILE)
   endif()
 endif()
 
+# For native builds where vcpkg toolchain incorrectly triggers cross-compilation detection
+message("VCPKG_TARGET_TRIPLET=${VCPKG_TARGET_TRIPLET}, CMAKE_HOST_SYSTEM_PROCESSOR=${CMAKE_HOST_SYSTEM_PROCESSOR}")
+if(VCPKG_TARGET_TRIPLET MATCHES "arm64-osx" AND CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "arm64")
+    # Point to where vcpkg will install Qt tools
+    set(QT_HOST_PATH "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}" CACHE PATH "Qt host tools path")
+    message("QT_HOST_PATH=${QT_HOST_PATH}")
+endif()
+
 file(READ "${CMAKE_CURRENT_SOURCE_DIR}/version.txt" PROCGEN_VERSION)
 string(STRIP "${PROCGEN_VERSION}" PROCGEN_VERSION)
 
