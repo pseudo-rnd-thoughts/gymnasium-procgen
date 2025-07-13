@@ -70,7 +70,7 @@ def test_state(env_name):
 
 
 def run_state_test(env_name):
-    env_kwargs = dict(num=2, env_name=env_name, rand_seed=0)
+    env_kwargs = dict(num_envs=2, env_name=env_name, rand_seed=0)
     env = ProcgenGym3Env(**env_kwargs)
     rng = np.random.RandomState(0)
     actions = [

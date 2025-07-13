@@ -33,11 +33,6 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
-# Workaround for Qt 6.8 cross-compilation detection bug on macOS
-if(APPLE AND CMAKE_SYSTEM_PROCESSOR STREQUAL CMAKE_HOST_SYSTEM_PROCESSOR)
-    set(CMAKE_CROSSCOMPILING FALSE CACHE BOOL "Force native compilation" FORCE)
-endif()
-
 # Find dependencies
 find_package(Qt6 REQUIRED COMPONENTS Core Gui)
 

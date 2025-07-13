@@ -5,7 +5,7 @@ import importlib.metadata
 from gymnasium_procgen.env import ProcgenEnv, ProcgenGym3Env
 from gymnasium_procgen.registration import register_environments
 
-__version__ = importlib.metadata.version("mypackage")
+__version__ = importlib.metadata.version("gymnasium_procgen")
 __all__ = ["ProcgenEnv", "ProcgenGym3Env", "__version__"]
 
 register_environments()

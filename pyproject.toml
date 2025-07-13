@@ -75,7 +75,7 @@ before-all = [
 # macOS arm64
 [[tool.cibuildwheel.overrides]]
 select = "*-macosx_arm64"
-environment = { PIP_ONLY_BINARY = "numpy", VCPKG_FEATURE_FLAGS = "-compilertracking", MACOSX_DEPLOYMENT_TARGET = "13.0" }
+environment = { PIP_ONLY_BINARY = "numpy", VCPKG_FEATURE_FLAGS = "-compilertracking", MACOSX_DEPLOYMENT_TARGET = "13.0", QT_HOST_PATH = "${VCPKG_INSTALLED_DIR}/arm64-osx"}
 
 # Windows x64
 [[tool.cibuildwheel.overrides]]
