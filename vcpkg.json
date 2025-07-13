@@ -11,15 +11,6 @@
         "gui",
         "png"
       ]
-    },
-    {
-      "name": "qtbase",
-      "host": true,
-      "default-features": false,
-      "features": [
-        "gui",
-        "png"
-      ]
     }
   ],
   "builtin-baseline": "b35194bce64fed3c48646cb32467e7725453c840",
