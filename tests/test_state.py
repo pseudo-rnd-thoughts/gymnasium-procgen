@@ -7,6 +7,7 @@ import pytest
 from gymnasium_procgen import ProcgenGym3Env
 from gymnasium_procgen.env import ENV_NAMES
 
+
 NUM_STEPS = 10000
 
 

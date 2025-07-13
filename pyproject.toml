@@ -27,9 +27,8 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    "numpy>=1.19.0",
-    "gym>=0.18.0",
-    "gym3>=0.3.3",
+    "gymnasium>=1.1",
+    "numpy>1.24",
 ]
 
 [project.optional-dependencies]
@@ -48,7 +47,7 @@ cmake.build-type = "Release"
 build.verbose = true
 
 # Include Python source files
-# wheel.packages = ["gymnasium_procgen"]
+ wheel.packages = ["gymnasium_procgen"]
 
 metadata.version.provider = "scikit_build_core.metadata.regex"
 metadata.version.input = "version.txt"
@@ -91,3 +90,12 @@ environment = { PIP_ONLY_BINARY = "numpy", VCPKG_FEATURE_FLAGS = "-compilertrack
 [[tool.cibuildwheel.overrides]]
 select = "*-manylinux_aarch64"
 environment = { PIP_ONLY_BINARY = "numpy", VCPKG_FEATURE_FLAGS = "-compilertracking" }
+
+
+[tool.isort]
+atomic = true
+profile = "black"
+extra_standard_library = ["typing_extensions"]
+indent = 4
+lines_after_imports = 2
+multi_line_output = 3
