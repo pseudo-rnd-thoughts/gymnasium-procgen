@@ -1,56 +1,49 @@
-from gymnasium_procgen.registration import (
-    EXPLORATION_LEVEL_SEEDS,
-    make_procgen_env,
-    make_procgen_vector_env,
+from gymnasium_procgen import (
+    EXPLORATION_LEVEL_SEEDS
 )
+from gymnasium_procgen.vector_env import ProcgenVectorEnv
+
+
+def make_procgen_vector_env(
+    env_name: str,
+    num_envs: int,
+    distribution_mode: str = "hard",
+    start_level: int = 0,
+    num_levels: int = 0,
+    **kwargs,
+) -> ProcgenVectorEnv:
+    """Create vectorized Procgen environment
+
+    Args:
+        env_name: Name of the Procgen environment
+        num_envs: Number of parallel environments
+        distribution_mode: Difficulty mode ('easy', 'hard', 'extreme', 'memory', 'exploration')
+        start_level: Starting level for training
+        num_levels: Number of levels to use (0 = unlimited)
+        **kwargs: Additional options
+    """
+    return ProcgenVectorEnv(
+        env_name=env_name,
+        num_envs=num_envs,
+        distribution_mode=distribution_mode,
+        start_level=start_level,
+        num_levels=num_levels,
+        **kwargs,
+    )
 
 
 if __name__ == "__main__":
     # Single environment with different distribution modes
     print("Creating environments with different distribution modes...")
 
-    # Easy mode - good for initial learning
-    env_easy = make_procgen_env(
-        "coinrun", distribution_mode="easy", lib_dir="./procgen_libs"
-    )
-
-    # Hard mode - standard training mode
-    env_hard = make_procgen_env(
-        "coinrun", distribution_mode="hard", num_levels=100, lib_dir="./procgen_libs"
-    )
-
-    # Exploration mode - uses specific seed for reproducible exploration
-    env_explore = make_procgen_env(
-        "coinrun", distribution_mode="exploration", lib_dir="./procgen_libs"
-    )
-    # Note: exploration mode automatically sets num_levels=1 and
-    # start_level=EXPLORATION_LEVEL_SEEDS["coinrun"]
-
-    # Test single environment
-    obs, info = env_hard.reset()
-    print(f"Observation shape: {obs.shape}")
-    print(f"Action space: {env_hard.action_space}")
-    print(f"Action combinations: {env_hard.get_combos()[:5]}...")  # Show first 5
-
-    for _ in range(10):
-        action = env_hard.action_space.sample()
-        obs, reward, terminated, truncated, info = env_hard.step(action)
-        if terminated or truncated:
-            obs, info = env_hard.reset()
-
-    env_easy.close()
-    env_hard.close()
-    env_explore.close()
-
     # Vector environment
-    print("\nCreating vectorized environment...")
+    print("Creating vectorized environment...")
     vec_env = make_procgen_vector_env(
         "coinrun",
         num_envs=4,
         distribution_mode="hard",
         num_levels=50,
         start_level=0,
-        lib_dir="./procgen_libs",
     )
 
     obs, infos = vec_env.reset()

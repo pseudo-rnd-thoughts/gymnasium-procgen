@@ -7,7 +7,7 @@ from cffi import FFI
 from gymnasium import spaces
 from gymnasium.vector import VectorEnv
 
-from gymnasium_procgen.registration import (
+from gymnasium_procgen import (
     DISTRIBUTION_MODE_DICT,
     ENV_NAMES,
     EXPLORATION_LEVEL_SEEDS,
@@ -25,7 +25,6 @@ class ProcgenVectorEnv(VectorEnv):
         self,
         env_name: str,
         num_envs: int,
-        lib_dir: str,
         start_level: int = 0,
         num_levels: int = 0,
         seed: int | None = None,
@@ -65,10 +64,15 @@ class ProcgenVectorEnv(VectorEnv):
 
         self.env_name = env_name
         self.num_envs = num_envs
-        self.lib_dir = lib_dir
+        self.lib_dir = "src"
 
         # Initialize C interface for vectorized environments
-        self._init_c_interface()
+        self._ffi = FFI()
+        with open(os.path.join(os.path.dirname(__file__), "src", "libenv.h")) as f:
+            self._ffi.cdef(f.read())
+
+        # Load shared library
+        self._c_lib = self._ffi.dlopen(os.path.join(self.lib_dir, self._get_lib_name()))
 
         # Configure options
         self._configure_options(
@@ -107,92 +111,6 @@ class ProcgenVectorEnv(VectorEnv):
         # Initialize buffers
         self._initialize_vector_buffers()
 
-    def _init_c_interface(self):
-        """Initialize C interface (same as single env)"""
-        self._ffi = FFI()
-        self._ffi.cdef(self._load_libenv_cdef())
-
-        # Load shared library
-        lib_name = self._get_lib_name()
-        lib_path = os.path.join(self.lib_dir, lib_name)
-        self._c_lib = self._ffi.dlopen(lib_path)
-
-    def _load_libenv_cdef(self) -> str:
-        """Load C definitions (same as single env)"""
-        return """
-            #define LIBENV_MAX_NAME_LEN 128
-            #define LIBENV_MAX_NDIM 16
-            #define LIBENV_VERSION 1
-
-            typedef void libenv_env;
-
-            enum libenv_dtype {
-                LIBENV_DTYPE_UNUSED = 0,
-                LIBENV_DTYPE_UINT8 = 1,
-                LIBENV_DTYPE_INT32 = 2,
-                LIBENV_DTYPE_FLOAT32 = 3,
-            };
-
-            union libenv_value {
-                uint8_t uint8;
-                int32_t int32;
-                float float32;
-            };
-
-            enum libenv_scalar_type {
-                LIBENV_SCALAR_TYPE_UNUSED = 0,
-                LIBENV_SCALAR_TYPE_REAL = 1,
-                LIBENV_SCALAR_TYPE_DISCRETE = 2,
-            };
-
-            enum libenv_space_name {
-                LIBENV_SPACE_UNUSED = 0,
-                LIBENV_SPACE_OBSERVATION = 1,
-                LIBENV_SPACE_ACTION = 2,
-                LIBENV_SPACE_INFO = 3,
-            };
-
-            struct libenv_tensortype {
-                char name[128];
-                enum libenv_scalar_type scalar_type;
-                enum libenv_dtype dtype;
-                int shape[16];
-                int ndim;
-                union libenv_value low;
-                union libenv_value high;
-            };
-
-            struct libenv_option {
-                char name[128];
-                enum libenv_dtype dtype;
-                int count;
-                void *data;
-            };
-
-            struct libenv_options {
-                struct libenv_option *items;
-                int count;
-            };
-
-            struct libenv_buffers {
-                void **ob;
-                float *rew;
-                uint8_t *first;
-                void **info;
-                void **ac;
-            };
-
-            int libenv_version(void);
-            libenv_env *libenv_make(int num, const struct libenv_options options);
-            int libenv_get_tensortypes(libenv_env *handle, enum libenv_space_name name, struct libenv_tensortype *types);
-            void libenv_set_buffers(libenv_env *handle, struct libenv_buffers *bufs);
-            void libenv_observe(libenv_env *handle);
-            void libenv_act(libenv_env *handle);
-            void libenv_close(libenv_env *handle);
-            int get_state(libenv_env *handle, int env_idx, char *data, int length);
-            void set_state(libenv_env *handle, int env_idx, char *data, int length);
-        """
-
     def _get_lib_name(self) -> str:
         """Get platform-specific library name"""
         system = platform.system()
@@ -213,7 +131,7 @@ class ProcgenVectorEnv(VectorEnv):
         if count == 0:
             return spaces.Dict({}), []
 
-        c_tensortypes = self._ffi.new("struct libenv_tensortype[%d]" % count)
+        c_tensortypes = self._ffi.new(f"struct libenv_tensortype[{count:d}]")
         self._c_lib.libenv_get_tensortypes(self._c_env, space_type, c_tensortypes)
 
         space_dict = {}
