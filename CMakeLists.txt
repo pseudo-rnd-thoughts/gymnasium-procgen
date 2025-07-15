@@ -15,6 +15,15 @@ if (NOT DEFINED CMAKE_TOOLCHAIN_FILE)
   endif()
 endif()
 
+# Overlay VCPKG custom triplets
+message("!!!!!!!!!! VCPKG_OVERLAY_TRIPLETS=${VCPKG_OVERLAY_TRIPLETS}")
+if(NOT DEFINED VCPKG_OVERLAY_TRIPLETS)
+  set(VCPKG_OVERLAY_TRIPLETS
+      "${CMAKE_CURRENT_SOURCE_DIR}"
+      CACHE STRING "")
+endif()
+message("!!!!!!!!!! VCPKG_OVERLAY_TRIPLETS=${VCPKG_OVERLAY_TRIPLETS}")
+
 file(READ "${CMAKE_CURRENT_SOURCE_DIR}/version.txt" PROCGEN_VERSION)
 string(STRIP "${PROCGEN_VERSION}" PROCGEN_VERSION)
 
@@ -36,4 +45,37 @@ endif()
 # Find dependencies
 find_package(Qt6 REQUIRED COMPONENTS Core Gui)
 
-# Rest of your CMakeLists.txt remains the same...
+# Collect all source files from gymnasium_procgen/src
+file(GLOB_RECURSE SOURCES
+    "gymnasium_procgen/src/*.cpp"
+    "gymnasium_procgen/src/*.h"
+)
+
+# Create the shared library
+add_library(procgen_env SHARED ${SOURCES})
+
+# Set target properties - Install to gymnasium_procgen package directory
+set_target_properties(procgen_env PROPERTIES
+    OUTPUT_NAME "env"
+    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/gymnasium_procgen
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/gymnasium_procgen
+)
+
+# Include directories
+target_include_directories(procgen_env
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/gymnasium_procgen/src
+)
+
+# Link libraries
+target_link_libraries(procgen_env
+    PRIVATE
+        Qt6::Core
+        Qt6::Gui
+)
+
+# Install the library to the Python package directory
+install(TARGETS procgen_env
+    LIBRARY DESTINATION gymnasium_procgen
+    RUNTIME DESTINATION gymnasium_procgen
+)
