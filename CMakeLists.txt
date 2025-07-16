@@ -17,7 +17,7 @@ endif()
 
 if(NOT DEFINED VCPKG_OVERLAY_TRIPLETS)
   set(VCPKG_OVERLAY_TRIPLETS
-      "${CMAKE_MODULE_PATH}/"
+      "${CMAKE_CURRENT_SOURCE_DIR}/cmake"
       CACHE STRING "")
 endif()
 

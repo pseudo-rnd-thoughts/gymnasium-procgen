@@ -46,8 +46,6 @@ jobs:
             arch: aarch64
           - runs-on: windows-latest
             arch: AMD64
-          - runs-on: macos-latest
-            arch: arm64
     runs-on: ${{ matrix.runs-on }}
 
     steps:
@@ -202,3 +200,24 @@ jobs:
 
       - name: Test
         run: python -m pytest
+
+  build-macos:
+    name: "${{ matrix.runs-on }} • arm64"
+    needs: pre-commit
+    defaults:
+      run:
+        shell: bash
+    runs-on: "macos-latest"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v3.0
+        env:
+          CIBW_ARCHS: "arm64"
+
+      - name: Upload wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-${{ runner.os }}-arm64
+          path: ./wheelhouse/*.whl
