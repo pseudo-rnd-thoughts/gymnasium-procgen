@@ -88,6 +88,7 @@ class BaseProcgenEnv(CEnv):
             resource_root = os.path.join(LIB_DIR, "data", "assets") + os.sep
             assert os.path.exists(resource_root)
 
+        print(f"{LIB_DIR=}, {os.listdir(LIB_DIR)=}")
         assert any(
             [
                 os.path.exists(os.path.join(LIB_DIR, name))

@@ -23,7 +23,6 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
 dependencies = [
@@ -71,11 +70,14 @@ before-all = [
     "brew upgrade",
     "brew install automake autoconf libtool"
 ]
+[tool.cibuildwheel.macos.environment]
+VCPKG_DEFAULT_TRIPLET = "arm64-osx-native"
+VCPKG_HOST_TRIPLET = "arm64-osx-native"
 
 # macOS arm64
 [[tool.cibuildwheel.overrides]]
 select = "*-macosx_arm64"
-environment = { PIP_ONLY_BINARY = "numpy", VCPKG_DEFAULT_TRIPLET = "arm64-osx-mixed",  VCPKG_HOST_TRIPLET = "arm64-osx-mixed", VCPKG_FEATURE_FLAGS = "-compilertracking", MACOSX_DEPLOYMENT_TARGET = "13.0" }
+environment = { PIP_ONLY_BINARY = "numpy", VCPKG_FEATURE_FLAGS = "-compilertracking", MACOSX_DEPLOYMENT_TARGET = "13.0" }
 
 # Windows x64
 [[tool.cibuildwheel.overrides]]

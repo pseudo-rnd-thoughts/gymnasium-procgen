@@ -19,6 +19,11 @@ if(NOT DEFINED VCPKG_OVERLAY_TRIPLETS)
   set(VCPKG_OVERLAY_TRIPLETS
       "${CMAKE_CURRENT_SOURCE_DIR}/cmake"
       CACHE STRING "")
+
+  if (apple)
+    set(VCPKG_DEFAULT_TRIPLET "arm64-osx-mixed")
+    set(VCPKG_HOST_TRIPLET "arm64-osx-mixed")
+  endif()
 endif()
 
 message("CMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}")
