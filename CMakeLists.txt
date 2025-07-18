@@ -1,5 +1,19 @@
 cmake_minimum_required(VERSION 3.15)
 
+# Overlay VCPKG custom triplets
+if(NOT DEFINED VCPKG_OVERLAY_TRIPLETS)
+  set(VCPKG_OVERLAY_TRIPLETS
+      "${CMAKE_CURRENT_SOURCE_DIR}/cmake"
+      CACHE STRING "")
+endif()
+
+# Discover VCPKG default triplet
+if(DEFINED ENV{VCPKG_DEFAULT_TRIPLET} AND NOT DEFINED VCPKG_TARGET_TRIPLET)
+  set(VCPKG_TARGET_TRIPLET
+      "$ENV{VCPKG_DEFAULT_TRIPLET}"
+      CACHE STRING "")
+endif()
+
 # Discover VCPKG toolchain
 if (NOT DEFINED CMAKE_TOOLCHAIN_FILE)
   # VCPKG_ROOT is what Microsoft recommends,
@@ -14,21 +28,6 @@ if (NOT DEFINED CMAKE_TOOLCHAIN_FILE)
         CACHE STRING "")
   endif()
 endif()
-
-if(NOT DEFINED VCPKG_OVERLAY_TRIPLETS)
-  set(VCPKG_OVERLAY_TRIPLETS
-      "${CMAKE_CURRENT_SOURCE_DIR}/cmake"
-      CACHE STRING "")
-
-  if (apple)
-    set(VCPKG_DEFAULT_TRIPLET "arm64-osx-mixed")
-    set(VCPKG_HOST_TRIPLET "arm64-osx-mixed")
-  endif()
-endif()
-
-message("CMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}")
-message("VCPKG_OVERLAY_TRIPLETS=${VCPKG_OVERLAY_TRIPLETS}")
-message("CMAKE_CROSSCOMPILING=${CMAKE_CROSSCOMPILING}")
 
 file(READ "${CMAKE_CURRENT_SOURCE_DIR}/version.txt" PROCGEN_VERSION)
 string(STRIP "${PROCGEN_VERSION}" PROCGEN_VERSION)
