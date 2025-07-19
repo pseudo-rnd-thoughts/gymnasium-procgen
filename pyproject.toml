@@ -80,7 +80,7 @@ environment = { PIP_ONLY_BINARY = "numpy", VCPKG_DEFAULT_TRIPLET = "arm64-osx-na
 # Windows x64
 [[tool.cibuildwheel.overrides]]
 select = "*-win_amd64"
-environment = { PIP_ONLY_BINARY = "numpy", VCPKG_FEATURE_FLAGS = "-compilertracking" }
+environment = { PIP_ONLY_BINARY = "numpy", VCPKG_DEFAULT_TRIPLET = "x64-windows", VCPKG_FEATURE_FLAGS = "-compilertracking" }
 
 # Linux x86-64 (manylinux)
 [[tool.cibuildwheel.overrides]]
