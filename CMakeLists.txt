@@ -1,18 +1,24 @@
 cmake_minimum_required(VERSION 3.15)
 
+# Set cmake module path
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
+
 # Overlay VCPKG custom triplets
 if(NOT DEFINED VCPKG_OVERLAY_TRIPLETS)
   set(VCPKG_OVERLAY_TRIPLETS
-      "${CMAKE_CURRENT_SOURCE_DIR}/cmake"
+      "${CMAKE_MODULE_PATH}"
       CACHE STRING "")
 endif()
 
 # Discover VCPKG default triplet
 if(DEFINED ENV{VCPKG_DEFAULT_TRIPLET} AND NOT DEFINED VCPKG_TARGET_TRIPLET)
+  message(status "ENV{VCPKG_DEFAULT_TRIPLET}=$ENV{VCPKG_DEFAULT_TRIPLET}")
   set(VCPKG_TARGET_TRIPLET
       "$ENV{VCPKG_DEFAULT_TRIPLET}"
       CACHE STRING "")
 endif()
+
+message(status "CMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}, VCPKG_OVERLAY_TRIPLETS=${VCPKG_OVERLAY_TRIPLETS}, ${VCPKG_TARGET_TRIPLET}")
 
 # Discover VCPKG toolchain
 if (NOT DEFINED CMAKE_TOOLCHAIN_FILE)
@@ -28,6 +34,15 @@ if (NOT DEFINED CMAKE_TOOLCHAIN_FILE)
         CACHE STRING "")
   endif()
 endif()
+
+# Don't allow running cmake in root directory
+if (CMAKE_BINARY_DIR STREQUAL CMAKE_SOURCE_DIR)
+  message(FATAL_ERROR [=[
+    Source and build directories cannot be the same.
+    You should probably also remove CMakeFiles/ and CMakeCache.txt.
+  ]=])
+endif()
+
 
 file(READ "${CMAKE_CURRENT_SOURCE_DIR}/version.txt" PROCGEN_VERSION)
 string(STRIP "${PROCGEN_VERSION}" PROCGEN_VERSION)

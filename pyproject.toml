@@ -34,6 +34,7 @@ dependencies = [
 [project.optional-dependencies]
 test = [
     "pytest>=6.0.0",
+    "pytest-benchmark"
 ]
 
 [project.urls]
@@ -70,14 +71,11 @@ before-all = [
     "brew upgrade",
     "brew install automake autoconf libtool"
 ]
-[tool.cibuildwheel.macos.environment]
-VCPKG_DEFAULT_TRIPLET = "arm64-osx-native"
-VCPKG_HOST_TRIPLET = "arm64-osx-native"
 
 # macOS arm64
 [[tool.cibuildwheel.overrides]]
 select = "*-macosx_arm64"
-environment = { PIP_ONLY_BINARY = "numpy", VCPKG_FEATURE_FLAGS = "-compilertracking", MACOSX_DEPLOYMENT_TARGET = "13.0" }
+environment = { PIP_ONLY_BINARY = "numpy", VCPKG_DEFAULT_TRIPLET = "arm64-osx-native", VCPKG_FEATURE_FLAGS = "-compilertracking", MACOSX_DEPLOYMENT_TARGET = "13.0" }
 
 # Windows x64
 [[tool.cibuildwheel.overrides]]
