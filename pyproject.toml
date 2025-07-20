@@ -69,7 +69,7 @@ environment-pass = ["GITHUB_REF"]
 before-all = [
     "brew update",
     "brew upgrade",
-    "brew install automake autoconf libtool"
+    "brew install automake autoconf autoconf-archive libtool"
 ]
 
 # macOS arm64
