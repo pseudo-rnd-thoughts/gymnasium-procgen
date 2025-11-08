@@ -1,0 +1,292 @@
+name: Build and Test Wheels
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - "v*"
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build_wheels:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, windows-2022, macos-13, macos-14]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up QEMU (for Linux ARM builds)
+        if: runner.os == 'Linux'
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+
+      # Install Qt6 on the host system
+      - name: Install Qt6 on Linux
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            qt6-base-dev \
+            libqt6gui6 \
+            libgl1-mesa-dev \
+            libxkbcommon-dev
+
+      - name: Install Qt6 on macOS
+        if: runner.os == 'macOS'
+        run: |
+          brew install qt6
+
+      - name: Install Qt6 on Windows
+        if: runner.os == 'Windows'
+        run: |
+          choco install qt6-base-dev -y
+        shell: powershell
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.21.3
+        env:
+          # Build for common Python versions
+          CIBW_BUILD: cp38-* cp39-* cp310-* cp311-* cp312-*
+
+          # Skip 32-bit builds and PyPy
+          CIBW_SKIP: "*-win32 *-manylinux_i686 pp*"
+
+          # Build ARM64 wheels on macOS 14 (M1), x86_64 on macOS 13
+          CIBW_ARCHS_MACOS: "x86_64 arm64"
+          CIBW_ARCHS_LINUX: "x86_64 aarch64"
+          CIBW_ARCHS_WINDOWS: "AMD64"
+
+          # Linux-specific: use manylinux2014 for broader compatibility
+          CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
+          CIBW_MANYLINUX_AARCH64_IMAGE: manylinux2014
+
+          # Install Qt6 in the build environment
+          CIBW_BEFORE_ALL_LINUX: |
+            yum install -y \
+              qt6-qtbase-devel \
+              mesa-libGL-devel \
+              libxkbcommon-devel || \
+            (dnf install -y epel-release && \
+             dnf config-manager --set-enabled powertools && \
+             dnf install -y qt6-qtbase-devel mesa-libGL-devel libxkbcommon-devel) || \
+            (apt-get update && \
+             apt-get install -y qt6-base-dev libgl1-mesa-dev libxkbcommon-dev)
+
+          CIBW_BEFORE_ALL_MACOS: |
+            brew install qt6
+
+          CIBW_BEFORE_ALL_WINDOWS: |
+            choco install qt6-base-dev -y
+
+          # Set Qt6 paths for CMake
+          CIBW_ENVIRONMENT_LINUX: >
+            CMAKE_PREFIX_PATH=/usr/lib64/cmake/Qt6:/usr/lib/x86_64-linux-gnu/cmake/Qt6
+            QT_QPA_PLATFORM=offscreen
+
+          CIBW_ENVIRONMENT_MACOS: >
+            CMAKE_PREFIX_PATH=$(brew --prefix qt6)/lib/cmake/Qt6
+            QT_QPA_PLATFORM=offscreen
+
+          CIBW_ENVIRONMENT_WINDOWS: >
+            CMAKE_PREFIX_PATH=C:/Qt/6.7.0/msvc2019_64/lib/cmake/Qt6
+            QT_QPA_PLATFORM=offscreen
+
+          # Repair wheels to bundle Qt6 libraries
+          CIBW_REPAIR_WHEEL_COMMAND_LINUX: |
+            auditwheel repair -w {dest_dir} {wheel}
+
+          CIBW_REPAIR_WHEEL_COMMAND_MACOS: |
+            delocate-wheel --require-archs {delocate_archs} -w {dest_dir} -v {wheel}
+
+          CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: |
+            delvewheel repair -w {dest_dir} {wheel}
+
+          # Install test dependencies
+          CIBW_TEST_REQUIRES: pytest numpy gym3
+
+          # Test each wheel after building
+          CIBW_TEST_COMMAND: >
+            pytest {project}/tests -v --tb=short
+
+      - name: List built wheels
+        shell: bash
+        run: |
+          echo "Built wheels:"
+          ls -lh wheelhouse/
+
+      - name: Upload wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-${{ matrix.os }}
+          path: ./wheelhouse/*.whl
+          retention-days: 30
+
+  # Additional comprehensive testing job for each OS
+  test_wheels:
+    name: Test ${{ matrix.os }} wheels (Python ${{ matrix.python-version }})
+    needs: build_wheels
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, windows-2022, macos-13]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Download wheels
+        uses: actions/download-artifact@v4
+        with:
+          name: wheels-${{ matrix.os }}
+          path: wheelhouse
+
+      - name: Install wheel
+        shell: bash
+        run: |
+          # Find the wheel for the current Python version and platform
+          WHEEL=$(ls wheelhouse/*.whl | grep -E "cp$(echo ${{ matrix.python-version }} | tr -d '.')" | head -n 1)
+          if [ -z "$WHEEL" ]; then
+            echo "No wheel found for Python ${{ matrix.python-version }}"
+            exit 1
+          fi
+          echo "Installing wheel: $WHEEL"
+          pip install "$WHEEL"
+
+      - name: Install test dependencies
+        run: |
+          pip install pytest pytest-benchmark numpy gym3
+
+      - name: Verify installation
+        run: |
+          python -c "import gymnasium_procgen; print(f'gymnasium-procgen version: {gymnasium_procgen.__version__}')"
+          python -c "import gymnasium_procgen; env = gymnasium_procgen.ProcgenEnv(num_envs=1, env_name='coinrun'); print('Environment created successfully')"
+
+      - name: Run pytest
+        run: |
+          pytest tests/ -v --tb=short
+
+      - name: Run basic smoke tests
+        shell: bash
+        run: |
+          python -c "
+          import gymnasium_procgen
+          import numpy as np
+
+          # Test creating environments
+          print('Testing environment creation...')
+          env = gymnasium_procgen.ProcgenEnv(num_envs=2, env_name='coinrun', num_levels=5)
+          print(f'Environment created: {env}')
+
+          # Test reset
+          print('Testing reset...')
+          env.reset()
+          print('Reset successful')
+
+          # Test step
+          print('Testing step...')
+          actions = np.array([0, 0])  # Actions for 2 environments
+          obs, rewards, dones, infos = env.step(actions)
+          print(f'Step successful - obs shape: {obs.shape}, rewards: {rewards}')
+
+          # Test multiple steps
+          print('Testing multiple steps...')
+          for i in range(10):
+              actions = np.random.randint(0, 15, size=2)
+              obs, rewards, dones, infos = env.step(actions)
+          print('Multiple steps successful')
+
+          print('All smoke tests passed!')
+          "
+
+  build_sdist:
+    name: Build source distribution
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build sdist
+        run: pipx run build --sdist
+
+      - name: Check sdist contents
+        run: |
+          tar -tzf dist/*.tar.gz | head -20
+
+      - name: Upload sdist
+        uses: actions/upload-artifact@v4
+        with:
+          name: sdist
+          path: dist/*.tar.gz
+          retention-days: 30
+
+  # Test that sdist can be built into a wheel
+  test_sdist:
+    name: Test source distribution
+    needs: build_sdist
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Qt6
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qt6-base-dev libgl1-mesa-dev libxkbcommon-dev
+
+      - name: Download sdist
+        uses: actions/download-artifact@v4
+        with:
+          name: sdist
+          path: dist
+
+      - name: Install from sdist
+        run: |
+          pip install scikit-build-core pybind11
+          pip install dist/*.tar.gz -v
+
+      - name: Install test dependencies
+        run: |
+          pip install pytest numpy gym3
+
+      - name: Test installation from sdist
+        run: |
+          python -c "import gymnasium_procgen; print(gymnasium_procgen.__version__)"
+          pytest tests/ -v
+
+#  upload_pypi:
+#    name: Upload to PyPI
+#    needs: [build_wheels, test_wheels, build_sdist, test_sdist]
+#    runs-on: ubuntu-latest
+#    # Only publish on tag pushes
+#    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+#    steps:
+#      - uses: actions/download-artifact@v4
+#        with:
+#          pattern: "*"
+#          merge-multiple: true
+#          path: dist
+#
+#      - name: List files to upload
+#        run: |
+#          ls -lh dist/
+#
+#      - uses: pypa/gh-action-pypi-publish@release/v1
+#        with:
+#          user: __token__
+#          password: ${{ secrets.PYPI_API_TOKEN }}

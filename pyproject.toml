@@ -1,8 +1,5 @@
 [build-system]
-requires = [
-    "scikit-build-core>=0.8.0",
-    "pybind11>=2.10.0",
-]
+requires = ["scikit-build-core>=0.8.0", "pybind11"]
 build-backend = "scikit_build_core.build"
 
 [project]
@@ -44,50 +41,18 @@ Repository = "https://github.com/Farama-Foundation/gymnasium-procgen"
 "Bug Tracker" = "https://github.com/Farama-Foundation/gymnasium-procgen/issues"
 
 [tool.scikit-build]
-cmake.build-type = "Release"
-build.verbose = true
+# Directory where CMakeLists.txt is located
+cmake.source-dir = "."
+# Minimum CMake version
+cmake.minimum-version = "3.18"
+# Build directory
+build-dir = "build/{wheel_tag}"
+# Install directory for the Python package
+wheel.install-dir = "gymnasium_procgen"
+# Enable verbose output for debugging
+cmake.verbose = true
+# Platform-specific configurations will be passed via environment variables
 
-# Include Python source files
-# wheel.packages = ["gymnasium_procgen"]
-
-metadata.version.provider = "scikit_build_core.metadata.regex"
-metadata.version.input = "version.txt"
-metadata.version.regex = "^(?P<value>.+)$"
-
-[tool.cibuildwheel]
-# Skip 32-bit wheels, PyPy & musllinux
-skip = ["*-win32", "*i686", "*-musllinux*"]
-
-build-frontend = "build"
-manylinux-x86_64-image = "manylinux-x86_64-vcpkg:latest"
-manylinux-aarch64-image = "manylinux-aarch64-vcpkg:latest"
-
-[tool.cibuildwheel.linux]
-environment-pass = ["GITHUB_REF"]
-
-[tool.cibuildwheel.macos]
-before-all = [
-    "brew update",
-    "brew upgrade",
-    "brew install automake autoconf autoconf-archive libtool"
-]
-
-# macOS arm64
-[[tool.cibuildwheel.overrides]]
-select = "*-macosx_arm64"
-environment = { PIP_ONLY_BINARY = "numpy", VCPKG_DEFAULT_TRIPLET = "arm64-osx-native", VCPKG_FEATURE_FLAGS = "-compilertracking", MACOSX_DEPLOYMENT_TARGET = "13.0" }
-
-# Windows x64
-[[tool.cibuildwheel.overrides]]
-select = "*-win_amd64"
-environment = { PIP_ONLY_BINARY = "numpy", VCPKG_DEFAULT_TRIPLET = "x64-windows", VCPKG_FEATURE_FLAGS = "-compilertracking" }
-
-# Linux x86-64 (manylinux)
-[[tool.cibuildwheel.overrides]]
-select = "*-manylinux_x86_64"
-environment = { PIP_ONLY_BINARY = "numpy", VCPKG_FEATURE_FLAGS = "-compilertracking" }
-
-# Linux ARM64 (manylinux)
-[[tool.cibuildwheel.overrides]]
-select = "*-manylinux_aarch64"
-environment = { PIP_ONLY_BINARY = "numpy", VCPKG_FEATURE_FLAGS = "-compilertracking" }
+[tool.scikit-build.cmake.define]
+# Use static Qt6 build if available to reduce dependencies
+CMAKE_BUILD_TYPE = "Release"

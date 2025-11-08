@@ -105,3 +105,20 @@ venv.bak/
 
 .envrc
 .build/
+
+# CMake build artifacts
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.cmake
+!CMakeLists.txt
+*.dylib
+*.dll
+
+# scikit-build-core
+_skbuild/
+*.egg-info/
+
+# cibuildwheel
+wheelhouse/

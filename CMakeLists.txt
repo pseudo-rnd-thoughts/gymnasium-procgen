@@ -1,104 +1,141 @@
-cmake_minimum_required(VERSION 3.15)
-
-# Set cmake module path
-set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
-
-# Overlay VCPKG custom triplets
-if(NOT DEFINED VCPKG_OVERLAY_TRIPLETS)
-  set(VCPKG_OVERLAY_TRIPLETS
-      "${CMAKE_MODULE_PATH}"
-      CACHE STRING "")
-endif()
-
-# Discover VCPKG default triplet
-if(DEFINED ENV{VCPKG_DEFAULT_TRIPLET} AND NOT DEFINED VCPKG_TARGET_TRIPLET)
-  message(status "ENV{VCPKG_DEFAULT_TRIPLET}=$ENV{VCPKG_DEFAULT_TRIPLET}")
-  set(VCPKG_TARGET_TRIPLET
-      "$ENV{VCPKG_DEFAULT_TRIPLET}"
-      CACHE STRING "")
-endif()
-
-message(status "CMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}, VCPKG_OVERLAY_TRIPLETS=${VCPKG_OVERLAY_TRIPLETS}, ${VCPKG_TARGET_TRIPLET}")
-
-# Discover VCPKG toolchain
-if (NOT DEFINED CMAKE_TOOLCHAIN_FILE)
-  # VCPKG_ROOT is what Microsoft recommends,
-  # VCPKG_INSTALLATION_ROOT is what's defined on Azure
-  if(DEFINED ENV{VCPKG_ROOT})
-    set(CMAKE_TOOLCHAIN_FILE
-        "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
-        CACHE STRING "")
-  elseif(DEFINED ENV{VCPKG_INSTALLATION_ROOT})
-    set(CMAKE_TOOLCHAIN_FILE
-        "$ENV{VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake"
-        CACHE STRING "")
-  endif()
-endif()
-
-# Don't allow running cmake in root directory
-if (CMAKE_BINARY_DIR STREQUAL CMAKE_SOURCE_DIR)
-  message(FATAL_ERROR [=[
-    Source and build directories cannot be the same.
-    You should probably also remove CMakeFiles/ and CMakeCache.txt.
-  ]=])
-endif()
-
-
-file(READ "${CMAKE_CURRENT_SOURCE_DIR}/version.txt" PROCGEN_VERSION)
-string(STRIP "${PROCGEN_VERSION}" PROCGEN_VERSION)
-
-project(gymnasium_procgen VERSION ${PROCGEN_VERSION} LANGUAGES CXX)
-
-message("VCPKG_OVERLAY_TRIPLETS=${VCPKG_OVERLAY_TRIPLETS}")
-message("CMAKE_CROSSCOMPILING=${CMAKE_CROSSCOMPILING}")
+cmake_minimum_required(VERSION 3.18)
+project(gymnasium_procgen LANGUAGES CXX)
 
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Global compiler settings
+# Position independent code is required for Python modules
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 
-# Build type defaults
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release)
-endif()
-
-# Find dependencies
+# Find Qt6 components - only Core and Gui (headless)
+# Qt6 should be provided by the system or built separately
 find_package(Qt6 REQUIRED COMPONENTS Core Gui)
 
-# Collect all source files from gymnasium_procgen/src
-file(GLOB_RECURSE SOURCES
-    "gymnasium_procgen/src/*.cpp"
-    "gymnasium_procgen/src/*.h"
+# Enable Qt6 minimal headless mode
+# This tells Qt to use the offscreen platform plugin
+add_compile_definitions(QT_QPA_PLATFORM=offscreen)
+
+# Collect all source files
+set(PROCGEN_SOURCES
+    # Core sources
+    gymnasium_procgen/src/assetgen.cpp
+    gymnasium_procgen/src/basic-abstract-game.cpp
+    gymnasium_procgen/src/cpp-utils.cpp
+    gymnasium_procgen/src/entity.cpp
+    gymnasium_procgen/src/game-registry.cpp
+    gymnasium_procgen/src/game.cpp
+    gymnasium_procgen/src/mazegen.cpp
+    gymnasium_procgen/src/randgen.cpp
+    gymnasium_procgen/src/resources.cpp
+    gymnasium_procgen/src/roomgen.cpp
+    gymnasium_procgen/src/vecgame.cpp
+    gymnasium_procgen/src/vecoptions.cpp
+
+    # Game implementations
+    gymnasium_procgen/src/games/bigfish.cpp
+    gymnasium_procgen/src/games/bossfight.cpp
+    gymnasium_procgen/src/games/caveflyer.cpp
+    gymnasium_procgen/src/games/chaser.cpp
+    gymnasium_procgen/src/games/climber.cpp
+    gymnasium_procgen/src/games/coinrun.cpp
+    gymnasium_procgen/src/games/coinrun_old.cpp
+    gymnasium_procgen/src/games/dodgeball.cpp
+    gymnasium_procgen/src/games/fruitbot.cpp
+    gymnasium_procgen/src/games/heist.cpp
+    gymnasium_procgen/src/games/jumper.cpp
+    gymnasium_procgen/src/games/leaper.cpp
+    gymnasium_procgen/src/games/maze.cpp
+    gymnasium_procgen/src/games/miner.cpp
+    gymnasium_procgen/src/games/ninja.cpp
+    gymnasium_procgen/src/games/plunder.cpp
+    gymnasium_procgen/src/games/starpilot.cpp
 )
 
-# Create the shared library
-add_library(procgen_env SHARED ${SOURCES})
+# Create the shared library (libenv.so / libenv.dylib / env.dll)
+add_library(env SHARED ${PROCGEN_SOURCES})
 
-# Set target properties - Install to gymnasium_procgen package directory
-set_target_properties(procgen_env PROPERTIES
+# Set the output name to match what the Python code expects
+set_target_properties(env PROPERTIES
+    PREFIX "lib"
     OUTPUT_NAME "env"
-    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/gymnasium_procgen
-    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/gymnasium_procgen
 )
+
+# Platform-specific library naming
+if(WIN32)
+    set_target_properties(env PROPERTIES
+        PREFIX ""
+        SUFFIX ".dll"
+    )
+elseif(APPLE)
+    set_target_properties(env PROPERTIES
+        SUFFIX ".dylib"
+    )
+else()
+    set_target_properties(env PROPERTIES
+        SUFFIX ".so"
+    )
+endif()
 
 # Include directories
-target_include_directories(procgen_env
-    PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}/gymnasium_procgen/src
+target_include_directories(env PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/gymnasium_procgen/src
 )
 
-# Link libraries
-target_link_libraries(procgen_env
-    PRIVATE
-        Qt6::Core
-        Qt6::Gui
+# Link Qt6 libraries
+target_link_libraries(env PRIVATE
+    Qt6::Core
+    Qt6::Gui
 )
 
-# Install the library to the Python package directory
-install(TARGETS procgen_env
+# Platform-specific settings
+if(APPLE)
+    # On macOS, ensure we use libc++ and appropriate deployment target
+    target_compile_options(env PRIVATE -stdlib=libc++)
+    set_target_properties(env PROPERTIES
+        MACOSX_RPATH ON
+        INSTALL_RPATH "@loader_path"
+    )
+elseif(UNIX)
+    # On Linux, set RPATH for bundled Qt libraries
+    set_target_properties(env PROPERTIES
+        INSTALL_RPATH "$ORIGIN"
+    )
+endif()
+
+# Windows-specific settings
+if(WIN32)
+    # Ensure proper DLL exports
+    target_compile_definitions(env PRIVATE
+        _CRT_SECURE_NO_WARNINGS
+    )
+endif()
+
+# Install the library to the gymnasium_procgen package directory
+install(TARGETS env
     LIBRARY DESTINATION gymnasium_procgen
     RUNTIME DESTINATION gymnasium_procgen
 )
+
+# Install Qt6 plugins for headless rendering
+# This ensures the offscreen platform plugin is available
+if(Qt6_FOUND)
+    # Get Qt6 plugin directory
+    get_target_property(QT_QMAKE_EXECUTABLE Qt6::qmake IMPORTED_LOCATION)
+    execute_process(
+        COMMAND "${QT_QMAKE_EXECUTABLE}" -query QT_INSTALL_PLUGINS
+        OUTPUT_VARIABLE QT_PLUGINS_DIR
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+
+    # Install the offscreen platform plugin
+    if(EXISTS "${QT_PLUGINS_DIR}/platforms")
+        install(DIRECTORY "${QT_PLUGINS_DIR}/platforms"
+            DESTINATION gymnasium_procgen/qt6_plugins
+            FILES_MATCHING
+            PATTERN "*offscreen*"
+            PATTERN "*minimal*"
+        )
+    endif()
+endif()
