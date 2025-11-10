@@ -71,6 +71,8 @@ jobs:
 
           # Install Qt6 in the build environment
           CIBW_BEFORE_ALL_LINUX: |
+            dnf install -y epel-release
+            dnf config-manager --set-enabled powertools
             dnf install -y \
               qt6-qtbase-devel \
               mesa-libGL-devel \
@@ -80,7 +82,9 @@ jobs:
             brew install qt6
 
           CIBW_BEFORE_ALL_WINDOWS: |
-            choco install qt6-base-dev -y
+            python -m pip install aqtinstall
+            python -m aqt install-qt windows desktop 6.7.0 win64_msvc2019_64 -m qtbase
+            dir C:\Qt\6.7.0\msvc2019_64 /s /b | findstr /i "Qt6Config.cmake"
 
           # Set Qt6 paths for CMake
           CIBW_ENVIRONMENT_LINUX: >
@@ -92,11 +96,10 @@ jobs:
             QT_QPA_PLATFORM=offscreen
             CMAKE_OSX_ARCHITECTURES=arm64
             ARCHFLAGS="-arch arm64"
-            MACOSX_DEPLOYMENT_TARGET=11.0
-            _PYTHON_HOST_PLATFORM=macosx-11.0-arm64
+            MACOSX_DEPLOYMENT_TARGET=14.0
 
           CIBW_ENVIRONMENT_WINDOWS: >
-            CMAKE_PREFIX_PATH=C:/Qt/6.7.0/msvc2019_64/lib/cmake/Qt6
+            CMAKE_PREFIX_PATH=C:\Qt\6.7.0\msvc2019_64\lib\cmake\Qt6
             QT_QPA_PLATFORM=offscreen
 
           # Repair wheels to bundle Qt6 libraries
