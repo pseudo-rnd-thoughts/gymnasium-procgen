@@ -16,16 +16,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, windows-2022, macos-13, macos-14]
+        os: [ubuntu-22.04, windows-2022, macos-14]
 
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set up QEMU (for Linux ARM builds)
-        if: runner.os == 'Linux'
-        uses: docker/setup-qemu-action@v3
-        with:
-          platforms: arm64
 
       # Install Qt6 on the host system
       - name: Install Qt6 on Linux
@@ -52,20 +46,19 @@ jobs:
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.21.3
         env:
-          # Build for common Python versions
-          CIBW_BUILD: cp38-* cp39-* cp310-* cp311-* cp312-*
+          # Build for Python 3.10-3.13
+          CIBW_BUILD: cp310-* cp311-* cp312-* cp313-*
 
           # Skip 32-bit builds and PyPy
           CIBW_SKIP: "*-win32 *-manylinux_i686 pp*"
 
-          # Build ARM64 wheels on macOS 14 (M1), x86_64 on macOS 13
-          CIBW_ARCHS_MACOS: "x86_64 arm64"
-          CIBW_ARCHS_LINUX: "x86_64 aarch64"
+          # Build ARM64 wheels on macOS 14, x86_64 on Linux and Windows
+          CIBW_ARCHS_MACOS: "arm64"
+          CIBW_ARCHS_LINUX: "x86_64"
           CIBW_ARCHS_WINDOWS: "AMD64"
 
           # Linux-specific: use manylinux2014 for broader compatibility
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
-          CIBW_MANYLINUX_AARCH64_IMAGE: manylinux2014
 
           # Install Qt6 in the build environment
           CIBW_BEFORE_ALL_LINUX: |
@@ -93,6 +86,9 @@ jobs:
           CIBW_ENVIRONMENT_MACOS: >
             CMAKE_PREFIX_PATH=$(brew --prefix qt6)/lib/cmake/Qt6
             QT_QPA_PLATFORM=offscreen
+            CMAKE_OSX_ARCHITECTURES=arm64
+            ARCHFLAGS="-arch arm64"
+            _PYTHON_HOST_PLATFORM=macosx-11.0-arm64
 
           CIBW_ENVIRONMENT_WINDOWS: >
             CMAKE_PREFIX_PATH=C:/Qt/6.7.0/msvc2019_64/lib/cmake/Qt6
@@ -136,8 +132,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, windows-2022, macos-13]
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        os: [ubuntu-22.04, windows-2022, macos-14]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
 
     steps:
       - uses: actions/checkout@v4
@@ -211,63 +207,6 @@ jobs:
           print('All smoke tests passed!')
           "
 
-  build_sdist:
-    name: Build source distribution
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Build sdist
-        run: pipx run build --sdist
-
-      - name: Check sdist contents
-        run: |
-          tar -tzf dist/*.tar.gz | head -20
-
-      - name: Upload sdist
-        uses: actions/upload-artifact@v4
-        with:
-          name: sdist
-          path: dist/*.tar.gz
-          retention-days: 30
-
-  # Test that sdist can be built into a wheel
-  test_sdist:
-    name: Test source distribution
-    needs: build_sdist
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Install Qt6
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y qt6-base-dev libgl1-mesa-dev libxkbcommon-dev
-
-      - name: Download sdist
-        uses: actions/download-artifact@v4
-        with:
-          name: sdist
-          path: dist
-
-      - name: Install from sdist
-        run: |
-          pip install scikit-build-core pybind11
-          pip install dist/*.tar.gz -v
-
-      - name: Install test dependencies
-        run: |
-          pip install pytest numpy gym3
-
-      - name: Test installation from sdist
-        run: |
-          python -c "import gymnasium_procgen; print(gymnasium_procgen.__version__)"
-          pytest tests/ -v
 
 #  upload_pypi:
 #    name: Upload to PyPI

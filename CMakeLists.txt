@@ -1,10 +1,28 @@
 cmake_minimum_required(VERSION 3.18)
+
+# On macOS, ensure we build for the correct architecture
+# This must be set BEFORE the project() command
+if(APPLE AND NOT DEFINED CMAKE_OSX_ARCHITECTURES)
+    # If not explicitly set by cibuildwheel, use the native architecture
+    execute_process(
+        COMMAND uname -m
+        OUTPUT_VARIABLE NATIVE_ARCH
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    set(CMAKE_OSX_ARCHITECTURES "${NATIVE_ARCH}" CACHE STRING "Target architectures" FORCE)
+endif()
+
 project(gymnasium_procgen LANGUAGES CXX)
 
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+
+# MSVC-specific: Qt6 requires /Zc:__cplusplus to properly report C++17
+if(MSVC)
+    add_compile_options(/Zc:__cplusplus)
+endif()
 
 # Position independent code is required for Python modules
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)

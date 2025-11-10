@@ -2,7 +2,6 @@
 
 import importlib.metadata
 import os
-import sys
 
 # Configure Qt6 for headless rendering
 # This must be set before any Qt libraries are loaded
@@ -14,8 +13,8 @@ _qt_plugins_dir = os.path.join(_package_dir, "qt6_plugins")
 if os.path.exists(_qt_plugins_dir):
     os.environ["QT_PLUGIN_PATH"] = _qt_plugins_dir
 
-from gymnasium_procgen.env import ProcgenEnv, ProcgenGym3Env
-from gymnasium_procgen.registration import register_environments
+from gymnasium_procgen.env import ProcgenEnv, ProcgenGym3Env  # noqa: E402
+from gymnasium_procgen.registration import register_environments  # noqa: E402
 
 __version__ = importlib.metadata.version("gymnasium_procgen")
 __all__ = ["ProcgenEnv", "ProcgenGym3Env", "__version__"]
