@@ -66,20 +66,15 @@ jobs:
           CIBW_ARCHS_LINUX: "x86_64"
           CIBW_ARCHS_WINDOWS: "AMD64"
 
-          # Linux-specific: use manylinux2014 for broader compatibility
-          CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
+          # Linux-specific: use manylinux_2_28 (AlmaLinux 8) which has Qt6 support
+          CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_28
 
           # Install Qt6 in the build environment
           CIBW_BEFORE_ALL_LINUX: |
-            yum install -y \
+            dnf install -y \
               qt6-qtbase-devel \
               mesa-libGL-devel \
-              libxkbcommon-devel || \
-            (dnf install -y epel-release && \
-             dnf config-manager --set-enabled powertools && \
-             dnf install -y qt6-qtbase-devel mesa-libGL-devel libxkbcommon-devel) || \
-            (apt-get update && \
-             apt-get install -y qt6-base-dev libgl1-mesa-dev libxkbcommon-dev)
+              libxkbcommon-devel
 
           CIBW_BEFORE_ALL_MACOS: |
             brew install qt6
@@ -97,6 +92,7 @@ jobs:
             QT_QPA_PLATFORM=offscreen
             CMAKE_OSX_ARCHITECTURES=arm64
             ARCHFLAGS="-arch arm64"
+            MACOSX_DEPLOYMENT_TARGET=11.0
             _PYTHON_HOST_PLATFORM=macosx-11.0-arm64
 
           CIBW_ENVIRONMENT_WINDOWS: >
