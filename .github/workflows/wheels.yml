@@ -78,10 +78,9 @@ jobs:
           CIBW_BEFORE_ALL_MACOS: |
             brew install qt6
 
-          CIBW_BEFORE_ALL_WINDOWS: >
+          CIBW_BEFORE_ALL_WINDOWS: >-
             python -m pip install aqtinstall &&
-            python -m aqt install-qt windows desktop 6.7.0 win64_msvc2019_64 -m qtbase &&
-            if exist "C:\Qt\6.7.0\msvc2019_64\lib\cmake\Qt6\Qt6Config.cmake" (echo Qt6 installed successfully) else (echo ERROR: Qt6Config.cmake not found && exit 1)
+            python -m aqt install-qt windows desktop 6.7.0 win64_msvc2019_64 -m qtbase
 
           # Set Qt6 paths for CMake
           CIBW_ENVIRONMENT_LINUX: >
@@ -111,9 +110,6 @@ jobs:
 
           # Install test dependencies
           CIBW_TEST_REQUIRES: pytest numpy gym3
-
-          # Skip testing on macOS due to Qt6 headless issues
-          CIBW_TEST_SKIP: "*-macosx*"
 
           # Test each wheel after building (Linux and Windows only)
           CIBW_TEST_COMMAND: >

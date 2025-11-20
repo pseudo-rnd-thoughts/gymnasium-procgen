@@ -2,6 +2,7 @@
 #include "cpp-utils.h"
 #include "vecoptions.h"
 #include "game.h"
+#include <QGuiApplication>
 
 const int32_t END_OF_BUFFER = 0xCAFECAFE;
 
@@ -143,6 +144,14 @@ static void stepping_worker(std::mutex &stepping_thread_mutex,
 
 void global_init(int rand_seed, std::string resource_root) {
     global_resource_root = resource_root;
+
+    // Initialize Qt application for headless rendering
+    // QGuiApplication is required before using QImage in Qt6
+    static int argc = 1;
+    static char app_name[] = "procgen";
+    static char* argv[] = {app_name, nullptr};
+    static QGuiApplication* app = new QGuiApplication(argc, argv);
+    (void)app; // Suppress unused variable warning
 
     try {
         images_load();
