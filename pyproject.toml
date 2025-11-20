@@ -43,7 +43,7 @@ Repository = "https://github.com/Farama-Foundation/gymnasium-procgen"
 # Directory where CMakeLists.txt is located
 cmake.source-dir = "."
 # Minimum CMake version
-build.minimum-version = "3.18"
+cmake.version = ">=3.18"
 # Build directory
 build-dir = "build/{wheel_tag}"
 # Install directory for the Python package

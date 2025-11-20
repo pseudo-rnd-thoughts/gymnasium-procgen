@@ -64,7 +64,7 @@ jobs:
           CIBW_ARCHS_WINDOWS: "AMD64"
 
           # Linux-specific: use manylinux_2_34 (AlmaLinux 9) which has Qt6 support
-          CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_34
+          CIBW_MANYLINUX_X86_64_IMAGE: quay.io/pypa/manylinux_2_34_x86_64:latest
 
           # Install Qt6 in the build environment
           CIBW_BEFORE_ALL_LINUX: |
