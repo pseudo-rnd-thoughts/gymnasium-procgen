@@ -43,13 +43,13 @@ Repository = "https://github.com/Farama-Foundation/gymnasium-procgen"
 # Directory where CMakeLists.txt is located
 cmake.source-dir = "."
 # Minimum CMake version
-cmake.minimum-version = "3.18"
+build.minimum-version = "3.18"
 # Build directory
 build-dir = "build/{wheel_tag}"
 # Install directory for the Python package
 wheel.install-dir = "gymnasium_procgen"
 # Enable verbose output for debugging
-cmake.verbose = true
+build.verbose = true
 # Platform-specific configurations will be passed via environment variables
 
 [tool.scikit-build.cmake.define]

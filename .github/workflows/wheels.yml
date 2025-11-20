@@ -46,11 +46,8 @@ jobs:
         run: |
           brew install qt6
 
-      - name: Install Qt6 on Windows
-        if: runner.os == 'Windows'
-        run: |
-          choco install qt6-base-dev -y
-        shell: powershell
+      # Qt6 on Windows is installed via aqtinstall in CIBW_BEFORE_ALL_WINDOWS
+      # No need to install it on the host system
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.21.3
@@ -66,8 +63,8 @@ jobs:
           CIBW_ARCHS_LINUX: "x86_64"
           CIBW_ARCHS_WINDOWS: "AMD64"
 
-          # Linux-specific: use manylinux_2_35 (AlmaLinux 9) which has Qt6 support
-          CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_35
+          # Linux-specific: use manylinux_2_34 (AlmaLinux 9) which has Qt6 support
+          CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_34
 
           # Install Qt6 in the build environment
           CIBW_BEFORE_ALL_LINUX: |
@@ -96,10 +93,11 @@ jobs:
             QT_QPA_PLATFORM=offscreen
             CMAKE_OSX_ARCHITECTURES=arm64
             ARCHFLAGS="-arch arm64"
-            MACOSX_DEPLOYMENT_TARGET=14.0
+            MACOSX_DEPLOYMENT_TARGET=11.0
 
           CIBW_ENVIRONMENT_WINDOWS: >
-            CMAKE_PREFIX_PATH=C:\Qt\6.7.0\msvc2019_64\lib\cmake\Qt6
+            Qt6_DIR=C:\Qt\6.7.0\msvc2019_64\lib\cmake\Qt6
+            CMAKE_PREFIX_PATH=C:\Qt\6.7.0\msvc2019_64
             QT_QPA_PLATFORM=offscreen
 
           # Repair wheels to bundle Qt6 libraries
