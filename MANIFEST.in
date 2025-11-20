@@ -1,0 +1,23 @@
+# Include all C++ source files
+recursive-include gymnasium_procgen/src *.cpp *.h *.hpp
+
+# Include CMake files
+include CMakeLists.txt
+
+# Include data/assets
+recursive-include gymnasium_procgen/data *
+
+# Include license and readme
+include LICENSE
+include README.md
+include CHANGES.md
+include CONTRIBUTING.md
+include ASSET_LICENSES.md
+
+# Exclude compiled files and build artifacts
+global-exclude *.pyc
+global-exclude *.pyo
+global-exclude __pycache__
+global-exclude *.so
+global-exclude *.dylib
+global-exclude *.dll

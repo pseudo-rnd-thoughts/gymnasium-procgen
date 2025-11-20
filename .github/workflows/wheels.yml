@@ -1,0 +1,151 @@
+name: Build and Test Wheels
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - "v*"
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - uses: pre-commit/action@v3.0.1
+
+  build_wheels:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, windows-2022, macos-14]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Install Qt6 on the host system
+      - name: Install Qt6 on Linux
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            qt6-base-dev \
+            libqt6gui6 \
+            libgl1-mesa-dev \
+            libxkbcommon-dev
+
+      - name: Install Qt6 on macOS
+        if: runner.os == 'macOS'
+        run: |
+          brew install qt6
+
+      # Qt6 on Windows is installed via aqtinstall in CIBW_BEFORE_ALL_WINDOWS
+      # No need to install it on the host system
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.21.3
+        env:
+          # Build for Python 3.10-3.13
+          CIBW_BUILD: cp310-* cp311-* cp312-* cp313-*
+
+          # Skip 32-bit builds, PyPy, and musllinux (Alpine)
+          CIBW_SKIP: "*-win32 *-manylinux_i686 *-musllinux_* pp*"
+
+          # Build ARM64 wheels on macOS 14, x86_64 on Linux and Windows
+          CIBW_ARCHS_MACOS: "arm64"
+          CIBW_ARCHS_LINUX: "x86_64"
+          CIBW_ARCHS_WINDOWS: "AMD64"
+
+          # Linux-specific: use manylinux_2_34 (AlmaLinux 9) which has Qt6 support
+          CIBW_MANYLINUX_X86_64_IMAGE: quay.io/pypa/manylinux_2_34_x86_64:latest
+
+          # Install Qt6 in the build environment
+          CIBW_BEFORE_ALL_LINUX: |
+            dnf install -y epel-release
+            dnf config-manager --set-enabled crb
+            dnf install -y \
+              qt6-qtbase-devel \
+              mesa-libGL-devel \
+              libxkbcommon-devel
+
+          CIBW_BEFORE_ALL_MACOS: |
+            brew install qt6
+
+          CIBW_BEFORE_ALL_WINDOWS: >-
+            python -m pip install aqtinstall &&
+            python -m aqt install-qt windows desktop 6.7.0 win64_msvc2019_64
+
+          # Set Qt6 paths for CMake
+          CIBW_ENVIRONMENT_LINUX: >
+            CMAKE_PREFIX_PATH=/usr/lib64/cmake/Qt6:/usr/lib/x86_64-linux-gnu/cmake/Qt6
+            QT_QPA_PLATFORM=offscreen
+
+          CIBW_ENVIRONMENT_MACOS: >
+            CMAKE_PREFIX_PATH=$(brew --prefix qt6)/lib/cmake/Qt6
+            QT_QPA_PLATFORM=offscreen
+            CMAKE_OSX_ARCHITECTURES=arm64
+            ARCHFLAGS="-arch arm64"
+            MACOSX_DEPLOYMENT_TARGET=14.0
+
+          CIBW_ENVIRONMENT_WINDOWS: >
+            CMAKE_ARGS="-DQt6_DIR=C:\Qt\6.7.0\msvc2019_64\lib\cmake\Qt6 -DCMAKE_PREFIX_PATH=C:\Qt\6.7.0\msvc2019_64"
+            QT_QPA_PLATFORM=offscreen
+
+          # Repair wheels to bundle Qt6 libraries
+          CIBW_REPAIR_WHEEL_COMMAND_LINUX: |
+            auditwheel repair -w {dest_dir} {wheel}
+
+          CIBW_REPAIR_WHEEL_COMMAND_MACOS: |
+            delocate-wheel --require-archs {delocate_archs} -w {dest_dir} -v {wheel}
+
+          CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: |
+            delvewheel repair -w {dest_dir} {wheel}
+
+          # Install test dependencies
+          CIBW_TEST_REQUIRES: pytest numpy gym3
+
+          # Test each wheel after building (Linux and Windows only)
+          CIBW_TEST_COMMAND: >
+            pytest {project}/tests -v --tb=short
+
+      - name: List built wheels
+        shell: bash
+        run: |
+          echo "Built wheels:"
+          ls -lh wheelhouse/
+
+      - name: Upload wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-${{ matrix.os }}
+          path: ./wheelhouse/*.whl
+          retention-days: 7
+
+#  upload_pypi:
+#    name: Upload to PyPI
+#    needs: [build_wheels, test_wheels, build_sdist, test_sdist]
+#    runs-on: ubuntu-latest
+#    # Only publish on tag pushes
+#    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+#    steps:
+#      - uses: actions/download-artifact@v4
+#        with:
+#          pattern: "*"
+#          merge-multiple: true
+#          path: dist
+#
+#      - name: List files to upload
+#        run: |
+#          ls -lh dist/
+#
+#      - uses: pypa/gh-action-pypi-publish@release/v1
+#        with:
+#          user: __token__
+#          password: ${{ secrets.PYPI_API_TOKEN }}

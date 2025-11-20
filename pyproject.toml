@@ -1,0 +1,63 @@
+[build-system]
+requires = ["scikit-build-core>=0.8.0", "pybind11"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "gymnasium-procgen"
+version = "0.11.0"
+description = "Procedurally Generated Game-Like RL Environments"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Farama Foundation", email = "jkterry@farama.org"}
+]
+requires-python = ">=3.10"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "numpy>=1.19.0",
+    "gym>=0.18.0",
+    "gym3>=0.3.3",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=6.0.0",
+    "pytest-benchmark"
+]
+
+[project.urls]
+Homepage = "https://github.com/Farama-Foundation/gymnasium-procgen"
+Documentation = "https://gymnasium-procgen.farama.org"
+Repository = "https://github.com/Farama-Foundation/gymnasium-procgen"
+"Bug Tracker" = "https://github.com/Farama-Foundation/gymnasium-procgen/issues"
+
+[tool.scikit-build]
+# Directory where CMakeLists.txt is located
+cmake.source-dir = "."
+# Minimum CMake version
+cmake.version = ">=3.18"
+# Build directory
+build-dir = "build/{wheel_tag}"
+# Install directory for the Python package
+wheel.install-dir = "gymnasium_procgen"
+# Enable verbose output for debugging
+build.verbose = true
+# Platform-specific configurations will be passed via environment variables
+
+[tool.scikit-build.cmake.define]
+# Use static Qt6 build if available to reduce dependencies
+CMAKE_BUILD_TYPE = "Release"
+
+[tool.pytest.ini_options]
+# Use importlib to avoid importing from the local source directory
+# This ensures tests run against the installed package in site-packages
+addopts = "--import-mode=importlib"
+testpaths = ["tests"]

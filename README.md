@@ -1,10 +1,8 @@
-# Procgen2: A maintained version of Procgen
-
-## Old readme Below
+# Gymnasium-procgen
 
 #### [[Blog Post]](https://openai.com/blog/procgen-benchmark/) [[Paper]](https://arxiv.org/abs/1912.01588)
 
-16 simple-to-use procedurally-generated [gym](https://github.com/openai/gym) environments which provide a direct measure of how quickly a reinforcement learning agent learns generalizable skills.  The environments run at high speed (thousands of steps per second) on a single core.
+16 simple-to-use procedurally-generated [gymnasium](https://github.com/farama-foundation/gymnasium) environments which provide a direct measure of how quickly a reinforcement learning agent learns generalizable skills.  The environments run at high speed (thousands of steps per second) on a single core.
 
 We ran a competition in 2020 which used these environments to measure sample efficiency and generalization in RL. You can learn more [here](https://www.aicrowd.com/challenges/neurips-2020-procgen-competition).
 
@@ -20,30 +18,22 @@ Compared to [Gym Retro](https://github.com/openai/retro), these environments are
 
 Supported platforms:
 
-- Windows 10
-- macOS 10.14 (Mojave), 10.15 (Catalina)
+- Windows
+- macOS
 - Linux (manylinux2010)
 
 Supported Pythons:
 
-- 3.7 64-bit
-- 3.8 64-bit
-- 3.9 64-bit
-- 3.10 64-bit
+- 3.10
+- 3.11
+- 3.12
+- 3.13
 
 Supported CPUs:
 
 - Must have at least AVX
 
 ## Installation
-
-First make sure you have a supported version of python:
-
-```
-# run these commands to check for the correct python version
-python -c "import sys; assert (3,7,0) <= sys.version_info <= (3,10,0), 'python is incorrect version'; print('ok')"
-python -c "import platform; assert platform.architecture()[0] == '64bit', 'python is not 64-bit'; print('ok')"
-```
 
 To install the wheel:
 
@@ -64,8 +54,12 @@ The keys are: left/right/up/down + q, w, e, a, s, d for the different (environme
 To create an instance of the [gym](https://github.com/openai/gym) environment:
 
 ```
-import gym
-env = gym.make("procgen:procgen-coinrun-v0")
+import gymnasium as gym
+import procgen
+
+gym.register_envs(procgen)
+
+env = gym.make("procgen/coinrun-v0")
 ```
 
 To create an instance of the [gym3](https://github.com/openai/gym3) (vectorized) environment:
@@ -77,7 +71,7 @@ env = ProcgenGym3Env(num=1, env_name="coinrun")
 
 ### Docker
 
-A [`Dockerfile`](docker/Dockerfile) is included to demonstrate a minimal Docker-based setup that works for running random agent.
+A [`Dockerfile`](.github/docker/Dockerfile) is included to demonstrate a minimal Docker-based setup that works for running random agent.
 
 ```
 docker build docker --tag procgen
@@ -95,7 +89,7 @@ docker run --rm -it procgen python -c "from procgen import ProcgenGym3Env; env =
 
 The observation space is a box space with the RGB pixels the agent sees in a numpy array of shape (64, 64, 3).  The expected step rate for a human player is 15 Hz.
 
-The action space is `Discrete(15)` for which button combo to press.  The button combos are defined in [`env.py`](procgen/env.py).
+The action space is `Discrete(15)` for which button combo to press.  The button combos are defined in [`env.py`](gymnasium_procgen/env.py).
 
 If you are using the vectorized environment, the observation space is a dictionary space where the pixels are under the key "rgb".
 
@@ -103,7 +97,7 @@ Here are the 16 environments:
 
 | Image | Name | Description |
 | --- | --- | --- |
-| <img src="https://raw.githubusercontent.com/openai/procgen/master/screenshots/bigfish.png" width="200px"> | `bigfish` | The player starts as a small fish and becomes bigger by eating other fish. The player may only eat fish smaller than itself, as determined solely by width. If the player comes in contact with a larger fish, the player is eaten and the episode ends. The player receives a small reward for eating a smaller fish and a large reward for becoming bigger than all other fish, at which point the episode ends. 
+| <img src="https://raw.githubusercontent.com/openai/procgen/master/screenshots/bigfish.png" width="200px"> | `bigfish` | The player starts as a small fish and becomes bigger by eating other fish. The player may only eat fish smaller than itself, as determined solely by width. If the player comes in contact with a larger fish, the player is eaten and the episode ends. The player receives a small reward for eating a smaller fish and a large reward for becoming bigger than all other fish, at which point the episode ends.
 | <img src="https://raw.githubusercontent.com/openai/procgen/master/screenshots/bossfight.png" width="200px"> | `bossfight` | The player controls a small starship and must destroy a much bigger boss starship. The boss randomly selects from a set of possible attacks when engaging the player. The player must dodge the incoming projectiles or be destroyed. The player can also use randomly scattered meteors for cover. After a set timeout, the boss becomes vulnerable and its shields go down. At this point, the players projectile attacks will damage the boss. Once the boss receives a certain amount of damage, the player receives a reward, and the boss re-raises its shields. If the player damages the boss several times in this way, the boss is destroyed, the player receives a large reward, and the episode ends.
 | <img src="https://raw.githubusercontent.com/openai/procgen/master/screenshots/caveflyer.png" width="200px"> | `caveflyer` | The player must navigate a network of caves to reach the exit. Player movement mimics the Atari game “Asteroids”: the ship can rotate and travel forward or backward along the current axis. The majority of the reward comes from successfully reaching the end of the level, though additional reward can be collected by destroying target objects along the way with the ship's lasers. There are stationary and moving lethal obstacles throughout the level.
 | <img src="https://raw.githubusercontent.com/openai/procgen/master/screenshots/chaser.png" width="200px"> | `chaser` | Inspired by the Atari game “MsPacman”. Maze layouts are generated using Kruskal’s algorithm, and then walls are removed until no dead-ends remain in the maze. The player must collect all the green orbs. 3 large stars spawn that will make enemies vulnerable for a short time when collected. A collision with an enemy that isn’t vulnerable results in the player’s death. When a vulnerable enemy is eaten, an egg spawns somewhere on the map that will hatch into a new enemy after a short time, keeping the total number of enemies constant. The player receives a small reward for collecting each orb and a large reward for completing the level.
@@ -204,9 +198,9 @@ The environment code is in C++ and is compiled into a shared library exposing th
 
 Once you have installed from source, you can customize an existing environment or make a new environment of your own.  If you want to create a fast C++ 2D environment, you can fork this repo and do the following:
 
-* Copy [`src/games/bigfish.cpp`](procgen/src/games/bigfish.cpp) to `src/games/<name>.cpp`
+* Copy [`src/games/bigfish.cpp`](gymnasium_procgen/src/games/bigfish.cpp) to `src/games/<name>.cpp`
 * Replace `BigFish` with `<name>` and `"bigfish"` with `"<name>"` in your cpp file
-* Add `src/games/<name>.cpp` to [`CMakeLists.txt`](procgen/CMakeLists.txt)
+* Add `src/games/<name>.cpp` to [`CMakeLists.txt`](gymnasium_procgen/CMakeLists.txt)
 * Run `python -m procgen.interactive --env-name <name>` to test it out
 
 This repo includes a travis configuration that will compile your environment and build python wheels for easy installation.  In order to have this build more quickly by caching the Qt compilation, you will want to configure a GCS bucket in [common.py](https://github.com/openai/procgen/blob/master/procgen-build/procgen_build/common.py#L5) and [setup service account credentials](https://github.com/openai/procgen/blob/master/procgen-build/procgen_build/build_package.py#L41).
