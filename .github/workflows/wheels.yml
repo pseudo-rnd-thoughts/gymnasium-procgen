@@ -66,13 +66,13 @@ jobs:
           CIBW_ARCHS_LINUX: "x86_64"
           CIBW_ARCHS_WINDOWS: "AMD64"
 
-          # Linux-specific: use manylinux_2_28 (AlmaLinux 8) which has Qt6 support
-          CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_28
+          # Linux-specific: use manylinux_2_35 (AlmaLinux 9) which has Qt6 support
+          CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_35
 
           # Install Qt6 in the build environment
           CIBW_BEFORE_ALL_LINUX: |
             dnf install -y epel-release
-            dnf config-manager --set-enabled powertools
+            dnf config-manager --set-enabled crb
             dnf install -y \
               qt6-qtbase-devel \
               mesa-libGL-devel \
