@@ -80,7 +80,7 @@ jobs:
 
           CIBW_BEFORE_ALL_WINDOWS: >-
             python -m pip install aqtinstall &&
-            python -m aqt install-qt windows desktop 6.7.0 win64_msvc2019_64 -m qtbase
+            python -m aqt install-qt windows desktop 6.7.0 win64_msvc2019_64
 
           # Set Qt6 paths for CMake
           CIBW_ENVIRONMENT_LINUX: >
