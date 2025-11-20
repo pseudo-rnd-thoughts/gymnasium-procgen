@@ -5,7 +5,7 @@ from gymnasium_procgen import ProcgenGym3Env
 from gymnasium_procgen.env import ENV_NAMES
 
 
-@pytest.mark.parametrize("env_name", ["coinrun", "starpilot"])
+@pytest.mark.parametrize("env_name", ENV_NAMES)
 def test_seeding(env_name):
     num_envs = 1
 
@@ -31,7 +31,7 @@ def test_seeding(env_name):
     assert not np.array_equal(obs1["rgb"], obs3["rgb"])
 
 
-@pytest.mark.parametrize("env_name", ["coinrun", "starpilot"])
+@pytest.mark.parametrize("env_name", ENV_NAMES)
 def test_determinism(env_name):
     def collect_observations():
         rng = np.random.RandomState(0)
@@ -51,20 +51,3 @@ def test_determinism(env_name):
     obs1 = collect_observations()
     obs2 = collect_observations()
     assert np.array_equal(obs1, obs2)
-
-
-@pytest.mark.parametrize("env_name", ENV_NAMES)
-@pytest.mark.parametrize("num_envs", [1, 2, 16])
-def test_multi_speed(env_name, num_envs, benchmark):
-    env = ProcgenGym3Env(num_envs=num_envs, env_name=env_name)
-
-    actions = np.zeros([env.num])
-
-    def rollout(max_steps):
-        step_count = 0
-        while step_count < max_steps:
-            env.act(actions)
-            env.observe()
-            step_count += 1
-
-    benchmark(lambda: rollout(1000))

@@ -131,10 +131,11 @@ if(WIN32)
     )
 endif()
 
-# Install the library to the gymnasium_procgen package directory
+# Install the library to the package root directory
+# scikit-build-core already handles the gymnasium_procgen prefix via wheel.install-dir
 install(TARGETS env
-    LIBRARY DESTINATION gymnasium_procgen
-    RUNTIME DESTINATION gymnasium_procgen
+    LIBRARY DESTINATION .
+    RUNTIME DESTINATION .
 )
 
 # Install Qt6 plugins for headless rendering
@@ -151,7 +152,7 @@ if(Qt6_FOUND)
     # Install the offscreen platform plugin
     if(EXISTS "${QT_PLUGINS_DIR}/platforms")
         install(DIRECTORY "${QT_PLUGINS_DIR}/platforms"
-            DESTINATION gymnasium_procgen/qt6_plugins
+            DESTINATION qt6_plugins
             FILES_MATCHING
             PATTERN "*offscreen*"
             PATTERN "*minimal*"

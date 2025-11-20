@@ -55,3 +55,9 @@ cmake.verbose = true
 [tool.scikit-build.cmake.define]
 # Use static Qt6 build if available to reduce dependencies
 CMAKE_BUILD_TYPE = "Release"
+
+[tool.pytest.ini_options]
+# Use importlib to avoid importing from the local source directory
+# This ensures tests run against the installed package in site-packages
+addopts = "--import-mode=importlib"
+testpaths = ["tests"]
